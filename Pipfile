@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "4.2.7"
+djangorestframework = "3.14.0"
+gunicorn = "21.2.0"
+uvicorn = "0.24.0.post1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
