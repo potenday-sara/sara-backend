@@ -260,3 +260,6 @@ fabric.properties
 !.idea/runConfigurations
 
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm+all
+.husky
+node_modules
+package-lock.json
