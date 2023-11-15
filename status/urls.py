@@ -1,8 +1,8 @@
 from rest_framework.routers import DefaultRouter
 
-from questions.views import QuestionViewSet
+from status.views import StatusViewSet
 
 router = DefaultRouter()
-router.register("", QuestionViewSet, basename="questions")
+router.register("", StatusViewSet, basename="status")
 
 urlpatterns = router.urls
