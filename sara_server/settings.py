@@ -29,6 +29,8 @@ DEBUG = True if ENV == "DEV" else False
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = ["https://api.sara-mara.com"]
+
 
 # Application definition
 
