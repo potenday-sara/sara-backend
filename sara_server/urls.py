@@ -48,4 +48,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("questions/", include("questions.urls")),
     path("status/", include("status.urls")),
+    path("cs/", include("cs.urls")),
 ]

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "questions",
     "status",
+    "cs",
 ]
 
 MIDDLEWARE = [
