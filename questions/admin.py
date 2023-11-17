@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from questions.models import Answer, Question, QuestionFeedback
+from questions.models import AI, Answer, Question, QuestionFeedback
 
 
 class AnswerInline(admin.StackedInline):
@@ -31,3 +31,17 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Question, QuestionAdmin)
+
+
+class AIAdmin(admin.ModelAdmin):
+    fields = ["type", "instruction"]
+    list_display = [
+        "type",
+        "created_at",
+        "updated_at",
+    ]
+    list_display_links = ["type"]
+    readonly_fields = ["created_at", "updated_at"]
+
+
+admin.site.register(AI, AIAdmin)
