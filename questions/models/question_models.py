@@ -1,14 +1,11 @@
 from django.db import models
 
 from core.models import CommonModel
+from questions.models.ai_models import AIType
 
 
 class Question(CommonModel):
-    class QuestionType(models.TextChoices):
-        SARA = "sara"
-        MARA = "mara"
-
-    type = models.CharField(max_length=4, choices=QuestionType.choices)
+    type = models.CharField(max_length=4, choices=AIType.choices)
     content = models.TextField()
     product = models.TextField()
 
@@ -19,7 +16,7 @@ class Question(CommonModel):
 
 
 class Answer(CommonModel):
-    question = models.OneToOneField(Question, on_delete=models.CASCADE)
+    question = models.OneToOneField("Question", on_delete=models.CASCADE)
     content = models.TextField()
 
     class Meta:
@@ -29,7 +26,7 @@ class Answer(CommonModel):
 
 
 class QuestionFeedback(CommonModel):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey("Question", on_delete=models.CASCADE)
     feedback = models.IntegerField(choices=[(1, "good"), (0, "normal"), (-1, "bad")])
 
     class Meta:
