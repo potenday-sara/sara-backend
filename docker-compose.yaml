@@ -10,12 +10,12 @@ services:
     depends_on:   # db 서비스가 시작된 후에 api 서비스를 시작하도록 설정
       - db
     environment:
-      - ENV=PROD
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=sara_db
-      - DB_USER=sara
-      - DB_PASSWORD=Sara123!
+      - ENV=${ENV}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
   db:
     image: postgres:16
     volumes:
@@ -23,9 +23,9 @@ services:
     expose:
       - 5432
     environment:
-      - POSTGRES_USER=sara
-      - POSTGRES_PASSWORD=Sara123!
-      - POSTGRES_DB=sara_db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
 
 volumes:
   postgres_data:
