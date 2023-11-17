@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "questions",
     "status",
     "cs",
+    "rank",
 ]
 
 MIDDLEWARE = [
