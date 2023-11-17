@@ -9,6 +9,8 @@ services:
       - "8000:8000"
     depends_on:   # db 서비스가 시작된 후에 api 서비스를 시작하도록 설정
       - db
+    env_file:
+      - .env
     environment:
       - ENV=${ENV}
       - DB_HOST=${DB_HOST}
@@ -22,6 +24,8 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     expose:
       - 5432
+    env_file:
+      - .env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
