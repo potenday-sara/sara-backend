@@ -7,6 +7,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from questions.models import Answer, Question, QuestionFeedback
 from questions.serializers import QuestionFeedbackSerializer, QuestionSerializer
+from questions.services import GPTService
 
 
 class QuestionViewSet(
@@ -21,9 +22,11 @@ class QuestionViewSet(
         serializer.is_valid(raise_exception=True)
         with transaction.atomic():
             question = serializer.save()
+            gpt_service = GPTService(ai_type=question.type)
+            answer = gpt_service.get_answer(question.product, question.content)
             Answer.objects.create(
                 question=question,
-                content="임시 GPT 답변",
+                content=answer,
             )
 
         headers = self.get_success_headers(serializer.data)
