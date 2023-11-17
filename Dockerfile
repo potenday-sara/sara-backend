@@ -1,5 +1,5 @@
 # Build Container Image Stage
-FROM python:3.12.0 as build
+FROM python:3.11.6 as build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN python -m pip install --no-cache-dir --upgrade pip && \
     python -m pipenv install
 
 # Runtime Container Image Stage
-FROM python:3.12.0-slim
+FROM python:3.11.6-slim
 
 RUN apt-get update && \
     apt-get install -y libpq-dev && \
