@@ -12,6 +12,7 @@ faker = "20.0.0"
 factory-boy = "3.3.0"
 psycopg2 = "2.9.9"
 drf-yasg = "*"
+openai = "*"
 
 [dev-packages]
 
