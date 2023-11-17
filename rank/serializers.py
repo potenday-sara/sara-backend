@@ -1,15 +1,19 @@
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
+from questions.models import Question
 from questions.models.ai_models import AIType
 
 
-class RankSerializer(serializers.Serializer):
+class RankSerializer(ModelSerializer):
     type = serializers.ChoiceField(write_only=True, choices=AIType.choices)
     product = serializers.CharField(read_only=True)
     rank = serializers.IntegerField(read_only=True)
 
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
+    class Meta:
+        model = Question
+        fields = (
+            "type",
+            "product",
+            "rank",
+        )
