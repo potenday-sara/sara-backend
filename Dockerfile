@@ -15,6 +15,7 @@ FROM python:3.11.6-slim
 
 RUN apt-get update && \
     apt-get install -y libpq-dev && \
+    apt-get install -y nginx && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -24,8 +25,9 @@ COPY ./ ./
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-# port 설정
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 EXPOSE 8000
+RUN chmod 777 /app/server.sh
 
 # run command 설정
-CMD ["sh", "-c", "python3 manage.py migrate && gunicorn --bind 0.0.0.0:8000 sara_server.asgi:application -k uvicorn.workers.UvicornWorker -w 8"]
+CMD ["sh", "-c", "/app/server.sh"]
