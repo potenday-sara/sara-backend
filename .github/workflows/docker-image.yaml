@@ -42,7 +42,7 @@ jobs:
 
     - name: Update image tag in deployment.yaml
       run: |
-        cd server
+        cd backend
         kustomize edit set image harbor.sara-mara.com/sara/server=harbor.sara-mara.com/sara/server:${{ steps.get_version.outputs.VERSION }}
 
     - name: Commit and push changes
