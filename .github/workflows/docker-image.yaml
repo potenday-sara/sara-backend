@@ -4,14 +4,18 @@ on:
   push:
     tags:
       - 'v*'
-
+env:
+  harbor-url: 'harbor.sara-mara.com'
+  project: 'sara'
+  backend: 'backend'
+  sidecar: 'sidecar'
 jobs:
-  build:
+  api-build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -19,7 +23,7 @@ jobs:
     - name: Login to Harbor
       uses: docker/login-action@v1
       with:
-        registry: harbor.sara-mara.com
+        registry: ${{ env.harbor-url }}
         username: ${{ secrets.HARBOR_USERNAME }}
         password: ${{ secrets.HARBOR_PASSWORD }}
 
@@ -28,11 +32,11 @@ jobs:
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
     - name: Build and push
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: harbor.sara-mara.com/sara/backend:${{ steps.get_version.outputs.VERSION }}
+        tags: ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}:${{ steps.get_version.outputs.VERSION }}
 
     - name: Checkout CD repository
       uses: actions/checkout@v2
@@ -43,7 +47,7 @@ jobs:
     - name: Update image tag in deployment.yaml
       run: |
         cd backend
-        kustomize edit set image harbor.sara-mara.com/sara/backend=harbor.sara-mara.com/sara/backend:${{ steps.get_version.outputs.VERSION }}
+        kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}:${{ steps.get_version.outputs.VERSION }}
 
     - name: Commit and push changes
       run: |
@@ -52,3 +56,49 @@ jobs:
         git add .
         git commit -m "Update image tag to ${{ steps.get_version.outputs.VERSION }}"
         git push
+  sidecar-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Harbor
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.harbor-url }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.sidecar }}:${{ steps.get_version.outputs.VERSION }}
+
+      - name: Checkout CD repository
+        uses: actions/checkout@v2
+        with:
+          repository: potenday-sara/sara-resources
+          token: ${{ secrets.CD_REPO_TOKEN }}
+
+      - name: Update image tag in deployment.yaml
+        run: |
+          cd backend
+          kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.sidecar }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.sidecar }}:${{ steps.get_version.outputs.VERSION }}
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update image tag to ${{ steps.get_version.outputs.VERSION }}"
+          git push
