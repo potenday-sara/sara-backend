@@ -81,7 +81,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          path: Dockerfile.service
+          file: Dockerfile.service
           push: true
           tags: ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}:${{ steps.get_version.outputs.VERSION }}
 
