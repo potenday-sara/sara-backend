@@ -1,0 +1,3 @@
+import os
+
+BOOTSTRAP_SERVERS = os.environ["BOOTSTRAP_SERVERS"]
