@@ -5,9 +5,9 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from questions.models import Answer, Question, QuestionFeedback
+from event_services.producer import Producer
+from questions.models import Question, QuestionFeedback
 from questions.serializers import QuestionFeedbackSerializer, QuestionSerializer
-from questions.services import GPTService
 
 
 class QuestionViewSet(
@@ -20,13 +20,12 @@ class QuestionViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         with transaction.atomic():
             question = serializer.save()
-            gpt_service = GPTService(ai_type=question.type)
-            answer = gpt_service.get_answer(question.product, question.content)
-            Answer.objects.create(
-                question=question,
-                content=answer,
+            producer = Producer()
+            producer.produce(
+                topic="question", key=str(question.id), value=dict(serializer.data)
             )
 
         headers = self.get_success_headers(serializer.data)

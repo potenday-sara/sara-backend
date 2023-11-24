@@ -11,6 +11,19 @@ services:
       - db
     env_file:
       - .env
+    networks:
+      - sara
+  service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+    depends_on:
+      - api
+      - db
+    env_file:
+      - .env
+    networks:
+      - sara
   db:
     image: postgres:16
     volumes:
@@ -19,6 +32,14 @@ services:
       - 5432
     env_file:
       - .env
+    networks:
+      - sara
 
 volumes:
   postgres_data:
+
+networks:
+  sara:
+    driver: bridge
+    external: true
+    internal: true
