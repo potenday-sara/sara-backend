@@ -8,6 +8,7 @@ class Question(CommonModel):
     type = models.CharField(max_length=4, choices=AIType.choices)
     content = models.TextField()
     product = models.TextField()
+    hidden = models.BooleanField(default=False)
 
     class Meta:
         db_table = "questions"

@@ -16,11 +16,12 @@ class QuestionFeedbackInline(admin.StackedInline):
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    fields = ["type", "content", "product"]
+    fields = ["type", "content", "product", "hidden"]
     list_display = [
         "type",
         "content",
         "product",
+        "hidden",
         "created_at",
         "updated_at",
     ]
