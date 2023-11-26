@@ -7,14 +7,15 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from event_services.producer import Producer
 from questions.models import Question, QuestionFeedback
-from questions.serializers import QuestionFeedbackSerializer, QuestionSerializer
+from questions.serializers import (QuestionFeedbackSerializer,
+                                   QuestionSerializer)
 
 
 class QuestionViewSet(
     ReadOnlyModelViewSet,
     CreateModelMixin,
 ):
-    queryset = Question.objects.select_related("answer").all()
+    queryset = Question.objects.select_related("answer").filter(hidden=False)
     serializer_class = QuestionSerializer
 
     def create(self, request, *args, **kwargs):
