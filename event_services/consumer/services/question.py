@@ -11,10 +11,18 @@ class QuestionEventService(BaseEventService):
         question_id = self.key
 
         print("gpt answer start")
-        gpt_service = GPTService(ai_type=ai_type)
-        answer = gpt_service.get_answer(product=product, question=content)
-        print(f"gpt answer: {answer}")
-        Answer.objects.create(
-            question_id=question_id,
-            content=answer,
-        )
+        try:
+            gpt_service = GPTService(ai_type=ai_type)
+            answer = gpt_service.get_answer(product=product, question=content)
+            print(f"gpt answer: {answer}")
+        except Exception as e:
+            print(f"gpt error: {e}")
+            return
+
+        try:
+            Answer.objects.create(
+                question_id=question_id,
+                content=answer,
+            )
+        except Exception as e:
+            print(f"answer create error: {e}")

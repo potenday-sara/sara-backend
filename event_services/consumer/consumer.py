@@ -28,6 +28,7 @@ class Consumer:
                         )
                         service = service_class[(msg.topic())](msg)
                         service.execute()
+                        del service
                     except Exception as e:
                         print(e)
 
