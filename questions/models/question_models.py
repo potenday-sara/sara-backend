@@ -16,16 +16,6 @@ class Question(CommonModel):
         verbose_name = "질문"
 
 
-class Answer(CommonModel):
-    question = models.OneToOneField("Question", on_delete=models.CASCADE)
-    content = models.TextField()
-
-    class Meta:
-        db_table = "answers"
-        app_label = "questions"
-        verbose_name = "답변"
-
-
 class QuestionFeedback(CommonModel):
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
     feedback = models.IntegerField(choices=[(1, "good"), (0, "normal"), (-1, "bad")])

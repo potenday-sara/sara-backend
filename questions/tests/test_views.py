@@ -3,6 +3,8 @@ from unittest.mock import patch
 from django.test import TestCase
 from rest_framework.test import APIClient
 
+from answers.models import Answer
+from answers.tests.factories import AnswerFactory
 from questions.consts import QUESTION_LIST_MAX_LENGTH
 from questions.models import QuestionFeedback
 from questions.tests.factories import AIFactory, QuestionFactory
@@ -15,6 +17,8 @@ class QuestionsView_테스트(TestCase):
     def setUpTestData(cls):
         cls.url = "/questions/"
         cls.question_list = QuestionFactory.create_batch(50, type="sara")
+        for question in cls.question_list:
+            AnswerFactory(question=question, checked=True)
         cls.ai = AIFactory(type="sara")
 
     def test_questions_조회_요청_성공_시(self):
@@ -30,6 +34,15 @@ class QuestionsView_테스트(TestCase):
         with self.subTest("히든 처리된 질문은 제외된다."):
             self.assertNotIn(
                 self.question_list[0].id, map(lambda x: x["id"], response.data)
+            )
+        with self.subTest("답변이 체크된 질문만 리턴된다."):
+            self.assertTrue(
+                all(
+                    map(
+                        lambda x: Answer.objects.get(question_id=x["id"]).checked,
+                        response.data,
+                    )
+                )
             )
         with self.subTest("설정된 최대 개수를 넘지 않는다."):
             self.assertTrue(len(response.data) <= QUESTION_LIST_MAX_LENGTH)

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from questions.models import AI, Answer, Question, QuestionFeedback
+from answers.models import Answer
+from questions.models import AI, Question, QuestionFeedback
 
 
 class AnswerInline(admin.StackedInline):
