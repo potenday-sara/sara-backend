@@ -25,4 +25,5 @@ class GPTService:
             model=self.model,
             messages=[self.role, message],
         )
+        self.client.close()
         return answer.choices[0].message.content
