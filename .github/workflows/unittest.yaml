@@ -1,5 +1,5 @@
 ---
-name: Unittest
+name: Test
 
 on:
   pull_request:
