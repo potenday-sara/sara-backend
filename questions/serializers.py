@@ -5,7 +5,7 @@ from questions.models import Question, QuestionFeedback
 
 
 class QuestionSerializer(ModelSerializer):
-    answer = serializers.CharField(source="answer.content", read_only=True)
+    answer = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Question

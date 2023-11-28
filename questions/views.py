@@ -9,8 +9,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from event_services.producer import Producer
 from questions.consts import QUESTION_LIST_MAX_LENGTH
 from questions.models import Question, QuestionFeedback
-from questions.serializers import (QuestionFeedbackSerializer,
-                                   QuestionSerializer)
+from questions.serializers import QuestionFeedbackSerializer, QuestionSerializer
 
 
 class QuestionViewSet(
@@ -24,7 +23,10 @@ class QuestionViewSet(
         queryset = self.filter_queryset(self.get_queryset())
 
         queryset = (
-            queryset.filter(hidden=False)
+            queryset.filter(
+                hidden=False,
+                answer__checked=True,
+            )
             .annotate(random=Random())
             .order_by("random")[:QUESTION_LIST_MAX_LENGTH]
         )

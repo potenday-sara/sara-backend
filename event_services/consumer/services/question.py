@@ -1,5 +1,5 @@
+from answers.models import Answer
 from event_services.consumer.services.base import BaseEventService
-from questions.models import Answer
 from questions.services import GPTService
 
 
@@ -15,7 +15,7 @@ class QuestionEventService(BaseEventService):
             gpt_service = GPTService(ai_type=ai_type)
             answer = gpt_service.get_answer(product=product, question=content)
             print(f"gpt answer: {answer}")
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             print(f"gpt error: {e}")
             return
 
@@ -24,5 +24,5 @@ class QuestionEventService(BaseEventService):
                 question_id=question_id,
                 content=answer,
             )
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             print(f"answer create error: {e}")

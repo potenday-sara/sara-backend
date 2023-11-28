@@ -17,20 +17,19 @@ class Consumer:
                 if msg is None:
                     continue
 
-                elif msg.error():
-                    print("Consumer error: {}".format(msg.error()))
+                if msg.error():
+                    print(f"Consumer error: {msg.error()}")
                     continue
 
-                else:
-                    try:
-                        print(
-                            f"topic: {msg.topic()} | key: {msg.key().decode('utf-8')}"
-                        )
-                        service = service_class[(msg.topic())](msg)
-                        service.execute()
-                        del service
-                    except Exception as e:
-                        print(e)
+                try:
+                    topic = msg.topic()
+                    key = msg.key().decode("utf-8")
+                    print(f"topic: {topic} | key: {key}")
+                    service = service_class[topic](msg)
+                    service.execute()
+                    del service
+                except Exception as e:  # pylint: disable=broad-except
+                    print(e)
 
         except KeyboardInterrupt:
             pass
