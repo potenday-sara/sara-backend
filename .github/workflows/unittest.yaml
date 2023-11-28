@@ -1,0 +1,72 @@
+---
+name: Unittest
+
+on:
+  pull_request:
+    branches:
+      - '**'
+env:
+  python-still-minor-version: '3.11'
+  python-version: '3.11.6'
+  cache-version: 1
+
+jobs:
+  setup-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.python-version }}
+      - uses: actions/cache@v3
+        id: deps-cache
+        with:
+          path: ${{ env.Python_ROOT_DIR }}/lib/python${{ env.python-still-minor-version }}/site-packages
+          key: ${{ runner.os }}-pydep-${{ env.cache-version }}-${{ env.Python3_ROOT_DIR }}-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: ${{ runner.os }}-pydep-
+      - name: Cache Hit? ${{ steps.deps-cache.outputs.cache-hit }}
+        run: echo '${{ steps.deps-cache.outputs.cache-hit }}'
+      - name: Install the target if the requirement is not installed
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libcurl4-gnutls-dev librtmp-dev
+          pip install pipenv
+          pipenv install --system --dev
+      - name: Install the target if the pylint & black is not installed
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: |
+          pipenv install pylint black==22.6.0 yamllint isort
+          pipenv install --system --dev
+
+  setup-deps-fail:
+    if: ${{ failure() }}
+    needs: setup-deps
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "fail!"
+
+  unittest:
+    if: ${{ success() }}
+    needs: setup-deps
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ""
+      BOOTSTRAP_SERVERS: ""
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.python-version }}
+      - uses: actions/cache@v3
+        id: deps-cache
+        with:
+          path: ${{ env.Python_ROOT_DIR }}/lib/python${{ env.python-still-minor-version }}/site-packages
+          key: ${{ runner.os }}-pydep-${{ env.cache-version }}-${{ env.Python3_ROOT_DIR }}-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: ${{ runner.os }}-pydep-
+      - name: Fetch Base refer Branch
+        run: echo "$(git fetch origin ${{ github.base_ref }})"
+      - name: Unit Test Run
+        run: |
+          python manage.py test

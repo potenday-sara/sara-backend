@@ -1,0 +1,105 @@
+[MASTER]
+ignore-patterns=
+  \d{4}_.*?.py,       # migration file name
+  settings.py,        # settings file
+  \w+.md,             # md files
+  \w+.log,
+  \w+.tsv,
+  \w+.csv,
+  \w+.log.\d+,
+  Dockerfile,
+  Pipfile,
+  Pipfile.lock,
+  package.json,
+  package-lock.json,
+
+ignore-paths=
+  ^.*\/settings\/,    # settings packages directory
+
+disable=
+  missing-docstring,
+  too-few-public-methods,
+  bare-except,
+  duplicate-code,
+  import-error,
+  no-name-in-module,
+  non-ascii-name,
+  invalid-name,
+  protected-access,
+  too-many-arguments,
+  too-many-ancestors,
+  too-many-public-methods,
+  too-many-locals,
+  wrong-import-order,
+  no-member,
+
+max-line-length=120
+
+
+
+[SIMILARITIES]
+ignore-imports=yes
+
+
+[VARIABLES]
+ignored-argument-names=_.*|^ignored_|^unused_|^request$|^args$|^kwargs$
+
+
+[DESIGN]
+max-attributes=15
+
+
+################################
+# 용어설명
+# permanently disabled    - 큰 이변이 없지 않는이상 지속적으로 disable
+# temporary disabled      - 추후 enable 예정
+# strategically disabled  - 지속적인 재검토 대상이며 상황에 따라서 enable시키거나 permanently disable 시킬 수 있음.
+################################
+
+
+################################
+# Permanently disabled rule list
+################################
+# C0144 : 'non-ascii-name' rules disabled for '한글' test
+# C0104 : 'invalid-name' rules disabled for '한글' test
+#
+# added by jung-hoon kim
+# max-line-length=120
+#
+# added by jaeyoung-lee
+# missing-docstring
+# R0903: too-few-public-methods,
+# W0702: bare-except,
+# E0401: import-error,
+################################
+
+
+################################
+# Temporary disabled
+################################
+# E0611 : 'no-name-in-module' rules disabled for 'drf-api-common' submodule for temporary
+# R0914 : 'too-many-locals'
+################################
+
+################################
+# strategically disabled
+################################
+# W0212 : 'protected-access' rules temporary disabled because 'python-django' plugin is not able to superlinter
+# R0913 : 'too-many-arguments' strategically disabled
+# R0901 : 'too-many-ancestors'
+# R0904 : 'too-many-public-methods'
+# R0913 : 'too-many-arguments'
+# C0411 : 'wrong-import-order' - pylint에 문제가 있음. 순서를 제대로 인식못함.
+# R0801 : 'no-member' - dynamic attribute 로 인해 발생하는 문제인데
+#                       해당 문제를 해결하는 모듈을 특정 버전에 한정해서 구현 가능하나
+#                       22-01-04 기준 파이썬 버전이 3.5.x 가 존재해서
+#                       장고 버전이 상이함에 따라 임시 disable 되었음.
+#
+# 경로/파일단위 예외처리 내역
+#   - settings.py, settings/* 에 대해서 모든 예외처리를 하였습니다.
+#     import * (wild-card) import가 바람직 하지 않습니다만
+#     각 프로젝트에서 모두 import하라고 권장 하는것보다는 개선할 유틸을 제공 하는게 났겠다 싶어 해당 유틸 개발 전까지 예외처리 하기로 결정 하였습니다.
+#   - dddd_{name}.py 형태의 모든 migration파일에 대해서 예외처리를 하였습니다.
+#     pylint에서 특정 경로별 다른 룰을 적용 할수가 없어 file naming때문에 예외처리를 하였고, 다른 대안을 찾을때까지 예외 적용 될 예정입니다.
+#
+# 설정 참고링크: https://www.codeac.io/documentation/pylint-configuration.html
