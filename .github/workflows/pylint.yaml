@@ -1,0 +1,78 @@
+---
+name: Lint Code Base
+
+on:
+  pull_request:
+    branches:
+      - '**'
+env:
+  python-still-minor-version: '3.11'
+  python-version: '3.11.6'
+  cache-version: 1
+
+jobs:
+  setup-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.python-version }}
+      - uses: actions/cache@v3
+        id: deps-cache
+        with:
+          path: ${{ env.Python_ROOT_DIR }}/lib/python${{ env.python-still-minor-version }}/site-packages
+          key: ${{ runner.os }}-pydep-${{ env.cache-version }}-${{ env.Python3_ROOT_DIR }}-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: ${{ runner.os }}-pydep-
+      - name: Cache Hit? ${{ steps.deps-cache.outputs.cache-hit }}
+        run: echo '${{ steps.deps-cache.outputs.cache-hit }}'
+      - name: Install the target if the requirement is not installed
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libcurl4-gnutls-dev librtmp-dev
+          pip install pipenv
+          pipenv install --system --dev
+      - name: Install the target if the pylint & black is not installed
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: |
+          pipenv install pylint black==22.6.0 yamllint isort
+          pipenv install --system --dev
+
+  setup-deps-fail:
+    if: ${{ failure() }}
+    needs: setup-deps
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "fail!"
+
+  lint-code-base:
+    if: ${{ success() }}
+    needs: setup-deps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.python-version }}
+      - uses: actions/cache@v3
+        id: deps-cache
+        with:
+          path: ${{ env.Python_ROOT_DIR }}/lib/python${{ env.python-still-minor-version }}/site-packages
+          key: ${{ runner.os }}-pydep-${{ env.cache-version }}-${{ env.Python3_ROOT_DIR }}-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: ${{ runner.os }}-pydep-
+      - name: Fetch Base refer Branch
+        run: echo "$(git fetch origin ${{ github.base_ref }})"
+      - name: Set Lint Target
+        run: |
+          ChangedPythonFiles=$(./.github/bin/pylint/git_get-diff-file-name_all.sh origin/${{ github.base_ref }})
+          echo "changed_python_files=$ChangedPythonFiles" >> "$GITHUB_ENV"
+      - name: Pylint Run
+        if: env.changed_python_files != ''
+        run: python3 -m pylint --rcfile=./.github/linters/.python-lint --output-format=colorized ${{ env.changed_python_files }}
+      - name: Black Run
+        if: env.changed_python_files != ''
+        run: python3 -m black --check --verbose ${{ env.changed_python_files }}
+      - name: Isort Run
+        if: env.changed_python_files != ''
+        run: python3 -m isort -c -v --settings-path=./pyproject.toml ${{ env.changed_python_files }}
