@@ -31,7 +31,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libcurl4-gnutls-dev librtmp-dev
-          pip install pipenv
+          pip install pipenv coverage
           pipenv install --system --dev
       - name: Install the target if the pylint & black is not installed
         if: steps.deps-cache.outputs.cache-hit != 'true'
@@ -69,4 +69,9 @@ jobs:
         run: echo "$(git fetch origin ${{ github.base_ref }})"
       - name: Unit Test Run
         run: |
-          python manage.py test
+          python -m coverage run --source=. '--omit=**/test*.py,venv/**,**/settings.py' manage.py test -v 2
+          python -m coverage xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
