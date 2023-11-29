@@ -21,6 +21,6 @@ class RankViewSet(GenericViewSet, ListModelMixin):
             .annotate(total=Count("id"))
             .annotate(rank=Window(expression=Rank(), order_by=F("total").desc()))
             .values("product", "rank")
-            .order_by("rank")
+            .order_by("rank")[:5]
         )
         return rank
