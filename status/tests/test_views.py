@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from status.tests.mock import MockCursor
+from status.tests.test_mock import MockCursor
 
 
 class health_check_요청_시(TestCase):
