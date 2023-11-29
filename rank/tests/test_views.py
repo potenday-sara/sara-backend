@@ -1,7 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from questions.models import QuestionFeedback
 from questions.tests.factories import QuestionFactory
 
 
