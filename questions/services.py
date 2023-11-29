@@ -16,7 +16,7 @@ class GPTService:
         self.message_template = "[구매 조언 요청 형식]\n상품:%s\n고민하고 있는 이유:%s"
 
     def get_answer(self, product: str, question: str) -> str:
-        client = OpenAI()
+        client = OpenAI(timeout=300)
         message = {
             "role": "user",
             "content": self.message_template % (product, question),
