@@ -47,7 +47,7 @@ class QuestionsView_테스트(TestCase):
         with self.subTest("설정된 최대 개수를 넘지 않는다."):
             self.assertTrue(len(response.data) <= QUESTION_LIST_MAX_LENGTH)
 
-    @patch("questions.views.Producer")
+    @patch("questions.views.task_get_answer")
     def test_question_등록_요청_성공_시(self, mock_producer):
         mock_producer.return_value.produce.return_value = None
         data = {
