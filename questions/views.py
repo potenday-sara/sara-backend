@@ -6,10 +6,10 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from event_services.producer import Producer
 from questions.consts import QUESTION_LIST_MAX_LENGTH
 from questions.models import Question, QuestionFeedback
 from questions.serializers import QuestionFeedbackSerializer, QuestionSerializer
+from questions.tasks import task_get_answer
 
 
 class QuestionViewSet(
@@ -45,10 +45,11 @@ class QuestionViewSet(
 
         with transaction.atomic():
             question = serializer.save()
-            producer = Producer()
-            producer.produce(
-                topic="question", key=str(question.id), value=dict(serializer.data)
-            )
+            # producer = Producer()
+            # producer.produce(
+            #     topic="question", key=str(question.id), value=dict(serializer.data)
+            # )
+            task_get_answer.apply_async(args=[str(question.id), serializer.data])
 
         headers = self.get_success_headers(serializer.data)
         return Response(
