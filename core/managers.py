@@ -56,6 +56,10 @@ class RestoreQuerySet(QuerySet):
     def deleted(self):
         return self.filter(deleted_at__isnull=False)
 
+    def active(self):
+        # 삭제되지 않은 객체만 필터링
+        return self.filter(deleted_at__isnull=True)
+
 
 class BaseManager(models.Manager):
     def get_queryset(self):
