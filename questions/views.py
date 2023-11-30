@@ -4,11 +4,10 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from questions.consts import QUESTION_LIST_MAX_LENGTH
 from questions.models import Question, QuestionFeedback
-from questions.models.cs_models import Feedback
 from questions.serializers import (
     FeedbackSerializer,
     QuestionFeedbackSerializer,
