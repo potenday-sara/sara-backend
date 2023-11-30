@@ -11,10 +11,12 @@ class GPTService:
         self.client = OpenAI()
 
         self.model = self.MODEL
-        self.role = {
-            "role": "system",
-            "content": AI.objects.get(type=ai_type).instruction,
-        }
+
+        self.roles = [
+            {"role": "system", "content": content}
+            for content in AI.objects.get(type=ai_type).instruction.splitlines()
+        ]
+
         self.message_template = "[구매 조언 요청 형식]\n상품:%s\n고민하고 있는 이유:%s"
 
     def get_answer(self, product: str, question: str) -> str:
@@ -24,6 +26,6 @@ class GPTService:
         }
         answer = self.client.chat.completions.create(
             model=self.model,
-            messages=[self.role, message],
+            messages=self.roles + [message],
         )
         return answer.choices[0].message.content
