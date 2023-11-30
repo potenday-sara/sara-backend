@@ -37,7 +37,4 @@ class QuestionFeedbackSerializer(ModelSerializer):
 class FeedbackSerializer(ModelSerializer):
     class Meta:
         model = Feedback
-        fields = (
-            "question",
-            "content",
-        )
+        fields = ("content",)
