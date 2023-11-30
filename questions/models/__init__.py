@@ -1,2 +1,3 @@
 from .ai_models import AI
-from .question_models import Question, QuestionFeedback
+from .cs_models import Feedback, QuestionFeedback
+from .question_models import Question
