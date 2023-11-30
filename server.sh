@@ -1,4 +1,4 @@
 #!/bin/sh
 python3 manage.py migrate
-gunicorn --bind 0.0.0.0:8888 sara_server.asgi:application -k uvicorn.workers.UvicornWorker -w 8 &
+gunicorn --bind 0.0.0.0:8888 sara_server.asgi:application -k uvicorn.workers.UvicornWorker -w 2 &
 nginx
