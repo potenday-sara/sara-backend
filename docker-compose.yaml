@@ -20,6 +20,7 @@ services:
     depends_on:
       - api
       - db
+      - rabbitmq
     env_file:
       - .env
     networks:
@@ -32,6 +33,13 @@ services:
       - 5432
     env_file:
       - .env
+    networks:
+      - sara
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - sara
 

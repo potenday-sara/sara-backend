@@ -25,4 +25,4 @@ COPY ./ ./
 ENV PATH="/app/.venv/bin:$PATH"
 
 # run command 설정
-CMD ["sh", "-c", "python service.py"]
+CMD ["sh", "-c", "celery -A sara_server worker -l info --autoscale=10,4"]
