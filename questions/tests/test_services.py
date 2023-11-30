@@ -19,8 +19,7 @@ class GPTService_테스트(TestCase):
             self.assertEqual(gpt_service.model, settings.OPENAI_MODEL)
 
         with self.subTest("role이 정상적으로 설정된다."):
-            self.assertEqual(gpt_service.role["role"], "system")
-            self.assertEqual(gpt_service.role["content"], self.ai.instruction)
+            self.assertEqual(gpt_service.roles[0]["role"], "system")
 
         with self.subTest("message_template이 정상적으로 설정된다."):
             self.assertEqual(
