@@ -69,7 +69,7 @@ jobs:
         run: echo "$(git fetch origin ${{ github.base_ref }})"
       - name: Unit Test Run
         run: |
-          python -m coverage run --source=. '--omit=**/test*.py,venv/**,sara_server/**,service.py,manage.py' manage.py test -v 2
+          python -m coverage run --source=. '--omit=**/test*.py,venv/**,sara_server/**,manage.py' manage.py test -v 2
           python -m coverage xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
