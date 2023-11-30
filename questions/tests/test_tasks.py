@@ -3,9 +3,14 @@ from unittest.mock import patch
 from django.test import TestCase
 
 from questions.tasks import task_get_answer
+from questions.tests.factories import AIFactory
 
 
 class task_get_answer_테스트(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ai = AIFactory(type="sara")
+
     @patch("questions.tasks.GPTService")
     @patch("questions.tasks.Answer.objects.create")
     def test_task_get_answer_success(self, mock_create, mock_gpt_service):
@@ -28,5 +33,23 @@ class task_get_answer_테스트(TestCase):
     def test_task_get_answer_gpt_service_exception(self, mock_print, mock_gpt_service):
         mock_gpt_service.return_value.get_answer.side_effect = Exception("GPT 서비스 에러")
 
-        with self.assertRaises(Exception):
-            mock_print.assert_call()
+        task_get_answer(
+            "test_key", {"type": "sara", "product": "product1", "content": "질문 내용"}
+        )
+
+        mock_print.assert_called_with("gpt error: GPT 서비스 에러")
+
+    @patch("questions.tasks.GPTService")
+    @patch("questions.tasks.Answer.objects.create")
+    @patch("questions.tasks.print")
+    def test_task_get_answer_answer_create_exception(
+        self, mock_print, mock_create, mock_gpt_service
+    ):
+        mock_gpt_service.return_value.get_answer.return_value = "테스트 답변"
+        mock_create.side_effect = Exception("Answer 생성 에러")
+
+        task_get_answer(
+            "test_key", {"type": "sara", "product": "product1", "content": "질문 내용"}
+        )
+
+        mock_print.assert_called_with("answer create error: Answer 생성 에러")
