@@ -14,13 +14,3 @@ class Question(CommonModel):
         db_table = "questions"
         app_label = "questions"
         verbose_name = "질문"
-
-
-class QuestionFeedback(CommonModel):
-    question = models.ForeignKey("Question", on_delete=models.CASCADE)
-    feedback = models.IntegerField(choices=[(1, "good"), (0, "normal"), (-1, "bad")])
-
-    class Meta:
-        db_table = "question_feedbacks"
-        app_label = "questions"
-        verbose_name = "질문 피드백"

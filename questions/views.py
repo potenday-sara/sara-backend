@@ -8,7 +8,11 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from questions.consts import QUESTION_LIST_MAX_LENGTH
 from questions.models import Question, QuestionFeedback
-from questions.serializers import QuestionFeedbackSerializer, QuestionSerializer
+from questions.serializers import (
+    FeedbackSerializer,
+    QuestionFeedbackSerializer,
+    QuestionSerializer,
+)
 from questions.tasks import task_get_answer
 
 
@@ -41,10 +45,6 @@ class QuestionViewSet(
 
         with transaction.atomic():
             question = serializer.save()
-            # producer = Producer()
-            # producer.produce(
-            #     topic="question", key=str(question.id), value=dict(serializer.data)
-            # )
             task_get_answer.apply_async(args=[str(question.id), serializer.data])
 
         headers = self.get_success_headers(serializer.data)
@@ -61,4 +61,12 @@ class QuestionViewSet(
             question=question,
             feedback=serializer.validated_data["feedback"],
         )
+        return Response(status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], serializer_class=FeedbackSerializer)
+    def cs(self, request, *args, **kwargs):
+        question = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(question=question)
         return Response(status=status.HTTP_201_CREATED)

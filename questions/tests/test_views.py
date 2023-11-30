@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 from answers.models import Answer
 from answers.tests.factories import AnswerFactory
 from questions.consts import QUESTION_LIST_MAX_LENGTH
-from questions.models import QuestionFeedback
+from questions.models import Feedback, QuestionFeedback
 from questions.tests.factories import AIFactory, QuestionFactory
 
 
@@ -73,3 +73,14 @@ class QuestionsView_테스트(TestCase):
             self.assertEqual(response.status_code, 201)
         with self.subTest("questions feedback 데이터가 생성된다"):
             QuestionFeedback.objects.get(question=self.question_list[0], feedback="1")
+
+    def test_question_cs_요청_성공_시(self):
+        response = self.client.post(
+            self.url + f"{self.question_list[0].id}" + "/cs/",
+            data={"content": "test", "question": self.question_list[0].id},
+        )
+        with self.subTest("status code 201이 리턴된다."):
+            self.assertEqual(response.status_code, 201)
+
+        with self.subTest("feedback 데이터가 생성된다"):
+            self.assertEqual(Feedback.objects.count(), 1)

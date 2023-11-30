@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from questions.models import Question, QuestionFeedback
+from questions.models import Feedback, Question, QuestionFeedback
 
 
 class QuestionSerializer(ModelSerializer):
@@ -32,3 +32,9 @@ class QuestionFeedbackSerializer(ModelSerializer):
             "question",
             "feedback",
         )
+
+
+class FeedbackSerializer(ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ("content",)
