@@ -25,6 +25,7 @@ urlpatterns = [
     path("answers/", include("answers.urls")),
     path("status/", include("status.urls")),
     path("rank/", include("rank.urls")),
+    path("shop/", include("shop.urls")),
 ]
 
 urlpatterns += swagger_urlpatterns
