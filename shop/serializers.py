@@ -24,8 +24,8 @@ class GoodsSerializer(Serializer):
     product_price = IntegerField(source="productPrice")
     product_url = CharField(source="productUrl")
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # pragma: no cover
         pass
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # pragma: no cover
         pass
