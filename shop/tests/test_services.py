@@ -97,7 +97,7 @@ class CouponAPI_테스트(TestCase):
         with self.subTest("request 함수가 정상적으로 호출된다."):
             mock_request.assert_called_once_with(
                 method="GET",
-                url=f"/products/bestcategories/test",
+                url="/products/bestcategories/test",
                 params={
                     "limit": 10,
                 },

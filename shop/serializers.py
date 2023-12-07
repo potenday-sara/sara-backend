@@ -23,3 +23,9 @@ class GoodsSerializer(Serializer):
     product_name = CharField(source="productName")
     product_price = IntegerField(source="productPrice")
     product_url = CharField(source="productUrl")
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass

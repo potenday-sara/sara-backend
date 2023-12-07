@@ -53,6 +53,8 @@ jobs:
     env:
       OPENAI_API_KEY: ""
       BOOTSTRAP_SERVERS: ""
+      COUPANG_API_KEY: ""
+      COUPANG_API_SECRET: ""
 
     steps:
       - uses: actions/checkout@v3
