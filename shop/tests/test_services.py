@@ -99,7 +99,7 @@ class CouponAPI_테스트(TestCase):
                 method="GET",
                 url="/products/bestcategories/test",
                 params={
-                    "limit": 10,
+                    "limit": 32,
                 },
             )
 
