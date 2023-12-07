@@ -79,15 +79,15 @@ class PERAlgorithmMixin(ABC):
         return per_data.data
 
     @abstractmethod
-    def _get_remain_ttl(self, key: str) -> float:
+    def _get_remain_ttl(self, key: str) -> float:  # pragma: no cover
         pass
 
     @abstractmethod
-    def _get_cache(self, key: str):
+    def _get_cache(self, key: str):  # pragma: no cover
         pass
 
     @abstractmethod
-    def _set_cache(self, key: str, data, ttl: int):
+    def _set_cache(self, key: str, data, ttl: int):  # pragma: no cover
         pass
 
 
