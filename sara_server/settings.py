@@ -114,6 +114,15 @@ else:
     }
 
 
+# Cache
+if ENV == "DEV":
+    REDIS_HOST = "localhost"
+    REDIS_PORT = "63791"
+else:
+    REDIS_HOST = os.environ["REDIS_HOST"]
+    REDIS_PORT = os.environ["REDIS_PORT"]
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
