@@ -60,7 +60,7 @@ class CoupangAPI:
     def __init__(self):
         self.client = CoupangClient()
 
-    def get_product_list(self, category_code, limit=10):
+    def get_product_list(self, category_code, limit=32):
         url = f"/products/bestcategories/{category_code}"
 
         querystring = {
