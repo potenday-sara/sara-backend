@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "questions",
     "status",
     "rank",
+    "shop",
 ]
 
 MIDDLEWARE = [
@@ -113,6 +114,15 @@ else:
     }
 
 
+# Cache
+if ENV == "DEV":
+    REDIS_HOST = "localhost"
+    REDIS_PORT = "6379"
+else:
+    REDIS_HOST = os.environ["REDIS_HOST"]
+    REDIS_PORT = os.environ["REDIS_PORT"]
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -159,3 +169,8 @@ OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 OPENAI_MODEL = "gpt-3.5-turbo"
 
 CELERY_BROKER_URL = "amqp://rabbitmq:5672/"
+
+COUPANG_API_KEY = os.environ["COUPANG_API_KEY"]
+COUPANG_API_SECRET = os.environ["COUPANG_API_SECRET"]
+COUPANG_API_HOST = "https://api-gateway.coupang.com"
+COUPANG_API_BASE_PATH = "/v2/providers/affiliate_open_api/apis/openapi/v1"
