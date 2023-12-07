@@ -117,7 +117,7 @@ else:
 # Cache
 if ENV == "DEV":
     REDIS_HOST = "localhost"
-    REDIS_PORT = "63791"
+    REDIS_PORT = "6379"
 else:
     REDIS_HOST = os.environ["REDIS_HOST"]
     REDIS_PORT = os.environ["REDIS_PORT"]

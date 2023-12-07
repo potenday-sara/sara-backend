@@ -74,13 +74,16 @@ class PERAlgorithmMixin_테스트(TestCase):
         with self.subTest("_set_per_data 함수가 정상적으로 호출된다."):
             mock_set_cache.assert_called()
 
+    @patch("core.cache.RedisCache._get_remain_ttl")
     @patch("core.cache.RedisCache._get_cache")
     @patch("core.cache.PERAlgorithmMixin._set_per_data")
     def test_fetch_per_cache_함수_호출_시_캐시_있을_경우(
         self,
         mock_set_per_data: MagicMock,
         mock_get_cache: MagicMock,
+        mock_get_remain_ttl: MagicMock,
     ):
+        mock_get_remain_ttl.return_value = 1000
         mock_get_cache.return_value = pickle.dumps(
             PERData(
                 data="test",
@@ -100,13 +103,16 @@ class PERAlgorithmMixin_테스트(TestCase):
         with self.subTest("_set_per_data 함수가 호출되지 않는다."):
             mock_set_per_data.assert_not_called()
 
+    @patch("core.cache.RedisCache._get_remain_ttl")
     @patch("core.cache.RedisCache._get_cache")
     @patch("core.cache.RedisCache._set_cache")
     def test_fetch_per_cache_함수_호출_시_캐시_있을_경우_force_recompute_True_일_경우(
         self,
         mock_set_cache: MagicMock,
         mock_get_cache: MagicMock,
+        mock_get_remain_ttl: MagicMock,
     ):
+        mock_get_remain_ttl.return_value = 1000
         mock_get_cache.return_value = pickle.dumps(
             PERData(
                 data="test",
