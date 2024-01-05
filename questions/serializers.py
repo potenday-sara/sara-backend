@@ -38,3 +38,15 @@ class FeedbackSerializer(ModelSerializer):
     class Meta:
         model = Feedback
         fields = ("content",)
+
+
+class QuestionDateCountSerializer(ModelSerializer):
+    date = serializers.DateTimeField()
+    count = serializers.IntegerField()
+
+    class Meta:
+        model = Feedback
+        fields = (
+            "date",
+            "count",
+        )

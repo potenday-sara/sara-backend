@@ -1,0 +1,67 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/admin_custom.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="stats-section">
+    <!-- Type Counts -->
+    <div class="type-counts">
+        <h3>{% trans 'Type Counts' %}</h3>
+        <ul>
+            {% for type_count in type_counts %}
+                <li>{{ type_count.type }}: {{ type_count.count }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Total Count -->
+    <div class="total-count">
+        <h3>{% trans 'Total Count' %}</h3>
+        <p>{{ total_count }}</p>
+    </div>
+
+    <!-- Date Wise Count Graph -->
+    <div class="date-count-graph">
+        <h3>{% trans 'Date Wise Count' %}</h3>
+        <canvas id="dateCountChart" width="400" height="200"></canvas>
+    </div>
+</div>
+
+<script>
+const datewiseCounts = JSON.parse('{{ datewise_counts|safe }}');
+
+// labels와 data 배열을 준비합니다.
+const labels = datewiseCounts.map(entry => entry.date);
+const dataPoints = datewiseCounts.map(entry => entry.count);
+
+// Chart.js를 사용하여 그래프를 그립니다.
+const data = {
+  labels: labels,
+  datasets: [{
+    label: 'Daily Questions',
+    backgroundColor: 'rgb(255, 99, 132)',
+    borderColor: 'rgb(255, 99, 132)',
+    data: dataPoints,
+  }]
+};
+
+const config = {
+  type: 'line',
+  data: data,
+  options: {}
+};
+
+const dateCountChart = new Chart(
+  document.getElementById('dateCountChart'),
+  config
+);
+</script>
+
+{{ block.super }}
+{% endblock %}
