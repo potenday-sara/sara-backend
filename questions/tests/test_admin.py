@@ -29,5 +29,7 @@ class QuestionAdminTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("datewise_counts", response.context_data)
+        self.assertIn("datewise_sara_counts", response.context_data)
+        self.assertIn("datewise_mara_counts", response.context_data)
         self.assertIn("type_counts", response.context_data)
         self.assertIn("total_count", response.context_data)
