@@ -86,6 +86,20 @@ class QuestionAdmin(admin.ModelAdmin):
             .annotate(count=Count("id"))
             .order_by("date")
         )
+        datewise_sara_counts = (
+            Question.objects.annotate(date=TruncDay("created_at"))
+            .values("date")
+            .annotate(count=Count("id"))
+            .filter(type="sara")
+            .order_by("date")
+        )
+        datewise_mara_counts = (
+            Question.objects.annotate(date=TruncDay("created_at"))
+            .values("date")
+            .annotate(count=Count("id"))
+            .filter(type="mara")
+            .order_by("date")
+        )
 
         # 타입별 카운트
         type_counts = Question.objects.values("type").annotate(count=Count("id"))
@@ -99,6 +113,18 @@ class QuestionAdmin(admin.ModelAdmin):
         extra_context["datewise_counts"] = json.dumps(
             QuestionDateCountSerializer(
                 datewise_counts,
+                many=True,
+            ).data
+        )
+        extra_context["datewise_sara_counts"] = json.dumps(
+            QuestionDateCountSerializer(
+                datewise_sara_counts,
+                many=True,
+            ).data
+        )
+        extra_context["datewise_mara_counts"] = json.dumps(
+            QuestionDateCountSerializer(
+                datewise_mara_counts,
                 many=True,
             ).data
         )
