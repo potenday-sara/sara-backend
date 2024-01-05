@@ -1,7 +1,12 @@
+import json
+
 from django.contrib import admin
+from django.db.models import Count
+from django.db.models.functions import TruncDay
 
 from answers.models import Answer
 from questions.models import AI, Feedback, Question, QuestionFeedback
+from questions.serializers import QuestionDateCountSerializer
 
 
 class AIAdmin(admin.ModelAdmin):
@@ -72,6 +77,36 @@ class QuestionAdmin(admin.ModelAdmin):
         QuestionFeedbackInline,
         FeedbackInline,
     ]
+
+    def changelist_view(self, request, extra_context=None):
+        # 날짜별 질문 카운트
+        datewise_counts = (
+            Question.objects.annotate(date=TruncDay("created_at"))
+            .values("date")
+            .annotate(count=Count("id"))
+            .order_by("date")
+        )
+
+        # 타입별 카운트
+        type_counts = Question.objects.values("type").annotate(count=Count("id"))
+
+        # 총 카운트
+        total_count = Question.objects.count()
+
+        # 커스텀 컨텍스트 생성
+        if extra_context is None:
+            extra_context = {}
+        extra_context["datewise_counts"] = json.dumps(
+            QuestionDateCountSerializer(
+                datewise_counts,
+                many=True,
+            ).data
+        )
+        extra_context["type_counts"] = type_counts
+        extra_context["total_count"] = total_count
+
+        # 기본 changelist_view 메소드 호출
+        return super().changelist_view(request, extra_context=extra_context)
 
 
 admin.site.register(Question, QuestionAdmin)

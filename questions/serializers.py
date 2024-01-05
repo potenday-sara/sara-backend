@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, Serializer
 
 from questions.models import Feedback, Question, QuestionFeedback
 
@@ -38,3 +38,14 @@ class FeedbackSerializer(ModelSerializer):
     class Meta:
         model = Feedback
         fields = ("content",)
+
+
+class QuestionDateCountSerializer(Serializer):
+    date = serializers.DateTimeField()
+    count = serializers.IntegerField()
+
+    def create(self, validated_data):
+        ...
+
+    def update(self, instance, validated_data):
+        ...
