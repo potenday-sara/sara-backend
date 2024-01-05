@@ -41,7 +41,7 @@ class FeedbackSerializer(ModelSerializer):
 
 
 class QuestionDateCountSerializer(ModelSerializer):
-    date = serializers.DateTimeField()
+    date = serializers.DateTimeField(format="%Y-%m-%d")
     count = serializers.IntegerField()
 
     class Meta:
