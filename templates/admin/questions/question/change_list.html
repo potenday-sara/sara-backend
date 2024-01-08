@@ -39,18 +39,18 @@ const labels = datewiseCounts.map(entry => entry.date);
 const dataPoints = datewiseCounts.map(entry => entry.count);
 
 const saraDatewiseCounts = JSON.parse('{{ datewise_sara_counts|safe }}');
-const saraDataPoints = datewiseCounts.map(entry => entry.count);
+const saraDataPoints = saraDatewiseCounts.map(entry => entry.count);
 
 const maraDatewiseCounts = JSON.parse('{{ datewise_mara_counts|safe }}');
-const maraDataPoints = datewiseCounts.map(entry => entry.count);
+const maraDataPoints = maraDatewiseCounts.map(entry => entry.count);
 
 // Chart.js를 사용하여 그래프를 그립니다.
 const data = {
   labels: labels,
   datasets: [{
     label: 'Daily Questions',
-    backgroundColor: 'rgb(255, 99, 132)',
-    borderColor: 'rgb(255, 99, 132)',
+    backgroundColor: 'rgb(94,168,30)',
+    borderColor: 'rgb(94,168,30)',
     data: dataPoints,
   },
   {
