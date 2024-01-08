@@ -87,17 +87,17 @@ class QuestionAdmin(admin.ModelAdmin):
             .order_by("date")
         )
         datewise_sara_counts = (
-            Question.objects.annotate(date=TruncDay("created_at"))
+            Question.objects.filter(type="sara")
+            .annotate(date=TruncDay("created_at"))
             .values("date")
             .annotate(count=Count("id"))
-            .filter(type="sara")
             .order_by("date")
         )
         datewise_mara_counts = (
-            Question.objects.annotate(date=TruncDay("created_at"))
+            Question.objects.filter(type="mara")
+            .annotate(date=TruncDay("created_at"))
             .values("date")
             .annotate(count=Count("id"))
-            .filter(type="mara")
             .order_by("date")
         )
 
