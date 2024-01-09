@@ -61,6 +61,7 @@ class FeedbackInline(admin.StackedInline):
 
 class QuestionAdmin(admin.ModelAdmin):
     fields = ["type", "content", "product", "hidden"]
+    ordering = ["-created_at"]
     list_display = [
         "type",
         "content",
