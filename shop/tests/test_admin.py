@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory, TestCase
 
@@ -18,7 +20,10 @@ class CategoryAdminTest(TestCase):
     def setUp(self):
         self.site = AdminSite()
 
-    def test_changelist_view(self):
+    @patch("core.cache.Redis")
+    def test_changelist_view(self, mock_redis: MagicMock):
+        mock_redis.return_value.get.return_value = None
+
         qa = CategoryAdmin(Category, self.site)
 
         request_factory = RequestFactory()
