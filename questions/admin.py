@@ -67,7 +67,6 @@ class QuestionAdmin(admin.ModelAdmin):
         "content",
         "product",
         "hidden",
-        "questionfeedback",
         "created_at",
         "updated_at",
     ]
