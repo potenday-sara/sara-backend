@@ -1,7 +1,10 @@
+from datetime import datetime
 from unittest.mock import patch
 
+import freezegun
 from django.conf import settings
 from django.test import TestCase
+from django.utils import timezone
 
 from shop.services import CoupangAPI, CoupangClient
 
@@ -105,3 +108,31 @@ class CouponAPI_테스트(TestCase):
 
         with self.subTest("json이 정상적으로 리턴된다."):
             self.assertEqual(response_data, coupang_data)
+
+    @freezegun.freeze_time("2024-01-01")
+    @patch("shop.services.CoupangClient.request")
+    def test_get_report_data_함수_호출_시(self, mock_request):
+        mock_request.return_value = mock_request.return_value
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.json.return_value = {"data": []}
+        coupang_api = CoupangAPI()
+        response_data = coupang_api.get_report_data()
+
+        urls = ["clicks", "orders", "cancels", "commission"]
+        date_range = {
+            "startDate": (datetime.now() - timezone.timedelta(days=30)).strftime(
+                "%Y%m%d"
+            ),
+            "endDate": datetime.now().strftime("%Y%m%d"),
+        }
+
+        with self.subTest("request 함수가 정상적으로 호출된다."):
+            for url in urls:
+                mock_request.assert_any_call(
+                    method="GET",
+                    url=f"/reports/{url}",
+                    params=date_range,
+                )
+
+        with self.subTest("json이 정상적으로 리턴된다."):
+            self.assertEqual(response_data, {url: [] for url in urls})
