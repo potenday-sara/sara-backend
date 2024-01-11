@@ -1,0 +1,34 @@
+name: Code Review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    if: ${{ contains(github.event.*.labels.*.name, 'gpt review') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anc95/ChatGPT-CodeReview@main
+        env:
+          MODEL: gpt-3.5-turbo-16k
+          GITHUB_TOKEN: ${{ secrets.BV_GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_KEY }}
+          LANGUAGE: Korean
+          temperature: 0.1
+          top_p: 1
+          max_tokens: 128
+          PROMPT: |
+            Assume the role of a seasoned software engineer with four decades of experience, specializing in Python. You are about to review a code patch. Your task is to provide a single, high-priority code review comment in one sentence. Please adhere to the following guidelines:
+            1. Keep your language extremely simple and extremely straightforward.
+            2. Refrain from commenting on the positive aspects of the code patch.
+            3. Do not describe what the code patch is intended to do.
+            4. Your comment should focus solely on identifying a potential bug, suggesting an improvement, or recommending adherence to best practices.
+            5. If it appears that libraries have been imported, assume that all necessary libraries are indeed imported.
+            6. If you find no issues of high priority, simply respond with 'OK'.
+            7. Your review should focus on a high-priority issue that truly necessitates modification. If no such issue is present, again, respond with 'OK'.
+            Now, please take a moment to analyze the code patch provided below. After careful consideration, provide your constructive code review comment in Korean.

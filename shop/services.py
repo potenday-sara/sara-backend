@@ -1,9 +1,11 @@
 import hashlib
 import hmac
+from datetime import datetime
 from time import gmtime, strftime
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.utils import timezone
 from requests import Session
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
@@ -68,7 +70,37 @@ class CoupangAPI:
         }
 
         response_data = self.client.request(
-            method="GET", url=url, params=querystring
+            method="GET",
+            url=url,
+            params=querystring,
         ).json()
 
         return response_data["data"]
+
+    def get_report_data(self):
+        urls = [
+            "clicks",
+            "orders",
+            "cancels",
+            "commission",
+        ]
+        start_date: datetime = timezone.now() - timezone.timedelta(days=30)
+        end_date: datetime = timezone.now()
+
+        querystring = {
+            "startDate": start_date.strftime("%Y%m%d"),
+            "endDate": end_date.strftime("%Y%m%d"),
+        }
+
+        response_data = {
+            url: self.client.request(
+                method="GET",
+                url=f"/reports/{url}",
+                params=querystring,
+            )
+            .json()
+            .get("data")
+            for url in urls
+        }
+
+        return response_data

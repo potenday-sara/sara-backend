@@ -1,0 +1,86 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/admin_custom.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="stats-section">
+    <!-- Date Wise Count Graph -->
+    <div class="date-count-graph">
+        <h3>{% trans '쿠팡 리포트' %}</h3>
+        <canvas id="dateCountChart" width="400" height="200"></canvas>
+    </div>
+</div>
+
+<script>
+
+const coupangReportData = JSON.parse('{{ report_data|safe }}');
+
+console.log(coupangReportData);
+
+const clickDatas = coupangReportData.clicks;
+const dateLabel = clickDatas.map(entry => {
+    const year = entry.date.substring(0, 4);
+    const month = entry.date.substring(4, 6);
+    const day = entry.date.substring(6, 8);
+    return `${year}-${month}-${day}`;
+});
+const clickDataPoints = clickDatas.map(entry => entry.click);
+
+const cancelDatas = coupangReportData.cancels;
+const cancelDataPoints = cancelDatas.map(entry => entry.click);
+
+const commissionDatas = coupangReportData.commission;
+const commissionDataPoints = commissionDatas.map(entry => entry.click);
+
+const orderCounts = coupangReportData.orders;
+const orderDataPoints = orderCounts.map(entry => entry.click);
+
+// Chart.js를 사용하여 그래프를 그립니다.
+const data = {
+  labels: dateLabel,
+  datasets: [{
+    label: 'Click Count',
+    backgroundColor: 'rgb(94,168,30)',
+    borderColor: 'rgb(94,168,30)',
+    data: clickDataPoints,
+  },
+  {
+    label: 'Cancel Count',
+    backgroundColor: 'rgb(168,30,30)',
+    borderColor: 'rgb(168,30,30)',
+    data: cancelDataPoints,
+  },
+  {
+    label: 'Commission Count',
+    backgroundColor: 'rgb(54,69,215)',
+    borderColor: 'rgb(54,69,215)',
+    data: commissionDataPoints,
+  },
+  {
+    label: 'Order Count',
+    backgroundColor: 'rgb(211,125,25)',
+    borderColor: 'rgb(211,125,25)',
+    data: orderDataPoints,
+  }]
+};
+
+const config = {
+  type: 'line',
+  data: data,
+  options: {}
+};
+
+const dateCountChart = new Chart(
+  document.getElementById('dateCountChart'),
+  config
+);
+</script>
+
+{{ block.super }}
+{% endblock %}
