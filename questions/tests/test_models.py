@@ -24,4 +24,6 @@ class QuestionFeedbackModelTest(TestCase):
         )
 
     def test_str_함수_호출_시(self):
-        self.assertEqual(str(self.question_feedback), "good")
+        self.assertEqual(
+            self.question_feedback.__str__(), QuestionFeedback.FeedbackType.GOOD.label
+        )
