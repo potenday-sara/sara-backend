@@ -67,7 +67,7 @@ class QuestionAdmin(admin.ModelAdmin):
         "content",
         "product",
         "hidden",
-        "questionfeedback",
+        "get_latest_questionfeedback",
         "created_at",
         "updated_at",
     ]
@@ -79,6 +79,12 @@ class QuestionAdmin(admin.ModelAdmin):
         QuestionFeedbackInline,
         FeedbackInline,
     ]
+
+    def get_latest_questionfeedback(self, obj: Question):
+        feedback = obj.questionfeedback_set.all().order_by("-created_at").first()
+        return feedback if feedback else None
+
+    get_latest_questionfeedback.short_description = "피드백"
 
     def changelist_view(self, request, extra_context=None):
         # 날짜별 질문 카운트

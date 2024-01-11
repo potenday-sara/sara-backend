@@ -9,7 +9,7 @@ class QuestionFeedback(CommonModel):
         NORMAL = 0, "normal"
         BAD = -1, "bad"
 
-    question = models.OneToOneField("Question", on_delete=models.CASCADE)
+    question = models.ForeignKey("Question", on_delete=models.CASCADE)
     feedback = models.IntegerField(choices=FeedbackType.choices)
 
     class Meta:
@@ -22,7 +22,7 @@ class QuestionFeedback(CommonModel):
 
 
 class Feedback(CommonModel):
-    question = models.OneToOneField("Question", on_delete=models.CASCADE, null=True)
+    question = models.ForeignKey("Question", on_delete=models.CASCADE, null=True)
     content = models.TextField()
 
     # 추후 유저 모델이 생기면 수정
