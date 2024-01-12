@@ -48,3 +48,17 @@ class QuestionAdminTest(TestCase):
 
         self.assertEqual(qa.get_latest_questionfeedback(question), question_feedback)
         self.assertIsNone(qa.get_latest_questionfeedback(Question()))
+
+    def test_set_question_hidden(self):
+        qa = QuestionAdmin(Question, self.site)
+
+        question = QuestionFactory(hidden=False)
+        question2 = QuestionFactory(hidden=False)
+
+        qa.set_question_hidden(None, Question.objects.all())
+
+        question.refresh_from_db()
+        question2.refresh_from_db()
+
+        self.assertTrue(question.hidden)
+        self.assertTrue(question2.hidden)
