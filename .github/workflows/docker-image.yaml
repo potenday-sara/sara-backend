@@ -12,6 +12,8 @@ env:
 jobs:
   api-build:
     runs-on: ubuntu-latest
+    outputs:
+      api-version: ${{ steps.get_version.outputs.VERSION }}
 
     steps:
     - name: Checkout code
@@ -38,26 +40,10 @@ jobs:
         push: true
         tags: ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}:${{ steps.get_version.outputs.VERSION }}
 
-    - name: Checkout CD repository
-      uses: actions/checkout@v2
-      with:
-        repository: potenday-sara/sara-resources
-        token: ${{ secrets.CD_REPO_TOKEN }}
-
-    - name: Update image tag in deployment.yaml
-      run: |
-        cd backend
-        kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}:${{ steps.get_version.outputs.VERSION }}
-
-    - name: Commit and push changes
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add .
-        git commit -m "Update image tag to ${{ steps.get_version.outputs.VERSION }}"
-        git push
   service-build:
     runs-on: ubuntu-latest
+    outputs:
+      service-version: ${{ steps.get_version.outputs.VERSION }}
 
     steps:
       - name: Checkout code
@@ -85,21 +71,30 @@ jobs:
           push: true
           tags: ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}:${{ steps.get_version.outputs.VERSION }}
 
+  update-repo:
+    needs: [ api-build, service-build ]
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout CD repository
         uses: actions/checkout@v2
         with:
           repository: potenday-sara/sara-resources
           token: ${{ secrets.CD_REPO_TOKEN }}
 
-      - name: Update image tag in deployment.yaml
+      - name: Update API image tag in deployment.yaml
         run: |
           cd backend
-          kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}:${{ steps.get_version.outputs.VERSION }}
+          kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}:${{ needs.api-build.outputs.api-version }}
+
+      - name: Update Service image tag in deployment.yaml
+        run: |
+          cd backend
+          kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}:${{ needs.service-build.outputs.service-version }}
 
       - name: Commit and push changes
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Update image tag to ${{ steps.get_version.outputs.VERSION }}"
+          git commit -m "Update image tags to API:${{ needs.api-build.outputs.api-version }} Service:${{ needs.service-build.outputs.service-version }}"
           git push
