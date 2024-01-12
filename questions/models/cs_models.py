@@ -4,13 +4,21 @@ from core.models import CommonModel
 
 
 class QuestionFeedback(CommonModel):
+    class FeedbackType(models.IntegerChoices):
+        GOOD = 1, "good"
+        NORMAL = 0, "normal"
+        BAD = -1, "bad"
+
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
-    feedback = models.IntegerField(choices=[(1, "good"), (0, "normal"), (-1, "bad")])
+    feedback = models.IntegerField(choices=FeedbackType.choices)
 
     class Meta:
         db_table = "question_feedbacks"
         app_label = "questions"
         verbose_name = "질문 피드백"
+
+    def __str__(self):
+        return self.FeedbackType(self.feedback).label
 
 
 class Feedback(CommonModel):
