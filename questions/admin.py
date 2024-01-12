@@ -84,7 +84,7 @@ class QuestionAdmin(admin.ModelAdmin):
         QuestionFeedbackInline,
         FeedbackInline,
     ]
-    actions = ['set_question_hidden']
+    actions = ["set_question_hidden"]
 
     def get_latest_questionfeedback(self, obj: Question):
         feedback = obj.questionfeedback_set.all().order_by("-created_at").first()
