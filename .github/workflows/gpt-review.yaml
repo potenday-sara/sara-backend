@@ -6,17 +6,17 @@ permissions:
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, labeled]
 
 jobs:
   test:
-    if: ${{ contains(github.event.*.labels.*.name, 'gpt review') }}
+    if: ${{ github.event.label.name == 'gpt review' }}
     runs-on: ubuntu-latest
     steps:
       - uses: anc95/ChatGPT-CodeReview@main
         env:
           MODEL: gpt-3.5-turbo-16k
-          GITHUB_TOKEN: ${{ secrets.BV_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_KEY }}
           LANGUAGE: Korean
           temperature: 0.1
