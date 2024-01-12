@@ -68,6 +68,7 @@ else:
     CORS_ALLOWED_ORIGINS = [
         "https://sara-mara.com",
         "https://www.sara-mara.com",
+        "https://stage.sara-mara.com",
     ]
 
 ROOT_URLCONF = "sara_server.urls"
