@@ -1,7 +1,7 @@
 import json
 
 from django.contrib import admin
-from django.db.models import Count
+from django.db.models import Count, QuerySet
 from django.db.models.functions import TruncDay
 from rangefilter.filters import DateRangeFilter
 
@@ -84,12 +84,19 @@ class QuestionAdmin(admin.ModelAdmin):
         QuestionFeedbackInline,
         FeedbackInline,
     ]
+    actions = ["set_question_hidden"]
 
     def get_latest_questionfeedback(self, obj: Question):
         feedback = obj.questionfeedback_set.all().order_by("-created_at").first()
         return feedback if feedback else None
 
     get_latest_questionfeedback.short_description = "피드백"
+
+    def set_question_hidden(self, request, queryset: QuerySet[Question]):
+        del request
+        queryset.update(hidden=True)
+
+    set_question_hidden.short_description = "선택된 항목을 숨기기"
 
     def changelist_view(self, request, extra_context=None):
         # 날짜별 질문 카운트
