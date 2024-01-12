@@ -55,7 +55,10 @@ class QuestionAdminTest(TestCase):
         question = QuestionFactory(hidden=False)
         question2 = QuestionFactory(hidden=False)
 
-        qa.set_question_hidden(None, Question.objects.all())
+        qa.set_question_hidden(
+            None,
+            Question.objects.all(),
+        )
 
         question.refresh_from_db()
         question2.refresh_from_db()
