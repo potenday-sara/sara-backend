@@ -3,6 +3,7 @@ import json
 from django.contrib import admin
 from django.db.models import Count
 from django.db.models.functions import TruncDay
+from rangefilter.filters import DateRangeFilter
 
 from answers.models import Answer
 from questions.models import AI, Feedback, Question, QuestionFeedback
@@ -70,6 +71,10 @@ class QuestionAdmin(admin.ModelAdmin):
         "get_latest_questionfeedback",
         "created_at",
         "updated_at",
+    ]
+    list_filter = [
+        ("created_at", DateRangeFilter),
+        ("updated_at", DateRangeFilter),
     ]
     search_fields = ["content", "product"]
     list_display_links = ["content", "product"]
