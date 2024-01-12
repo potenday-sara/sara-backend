@@ -1,8 +1,10 @@
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory, TestCase
 
+from answers.tests.factories import AnswerFactory
 from questions.admin import QuestionAdmin
 from questions.models import Question
+from questions.tests.factories import QuestionFactory
 
 
 class MockSuperUser:
@@ -33,3 +35,16 @@ class QuestionAdminTest(TestCase):
         self.assertIn("datewise_mara_counts", response.context_data)
         self.assertIn("type_counts", response.context_data)
         self.assertIn("total_count", response.context_data)
+
+    def test_get_latest_questionfeedback(self):
+        qa = QuestionAdmin(Question, self.site)
+
+        question = QuestionFactory(type="sara")
+        AnswerFactory(question=question, checked=True)
+
+        question_feedback = question.questionfeedback_set.create(
+            feedback=1,
+        )
+
+        self.assertEqual(qa.get_latest_questionfeedback(question), question_feedback)
+        self.assertIsNone(qa.get_latest_questionfeedback(Question()))
