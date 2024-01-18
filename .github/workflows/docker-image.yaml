@@ -104,7 +104,7 @@ jobs:
           tags: ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.beat }}:${{ steps.get_version.outputs.VERSION }}
 
   update-repo:
-    needs: [ api-build, service-build ]
+    needs: [ api-build, service-build, beat-build ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout CD repository
