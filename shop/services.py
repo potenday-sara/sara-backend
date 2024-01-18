@@ -104,3 +104,18 @@ class CoupangAPI:
         }
 
         return response_data
+
+    def search_product(self, keyword: str):
+        url = "/products/search"
+
+        querystring = {
+            "keyword": keyword,
+        }
+
+        response_data = self.client.request(
+            method="GET",
+            url=url,
+            params=querystring,
+        ).json()
+
+        return response_data["data"]["productData"]
