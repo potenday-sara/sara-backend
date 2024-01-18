@@ -44,6 +44,7 @@ def task_send_slack_message():
 
     now = timezone.now()
     d_1 = now - timezone.timedelta(days=1)
+    d_1.replace(hour=0, minute=0, second=0, microsecond=0)
 
     daily_all_count = Question.objects.filter(created_at__range=(d_1, now)).count()
     daily_sara_count = Question.objects.filter(
