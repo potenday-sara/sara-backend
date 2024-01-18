@@ -3,6 +3,7 @@ from unittest.mock import patch
 import freezegun
 from django.test import TestCase
 from django.utils import timezone
+from slack.errors import SlackApiError
 
 from questions.consts import QUESTION_SLACK_MESSAGE_TEMPLATE
 from questions.models import Question
@@ -66,7 +67,7 @@ class task_send_slack_message_테스트(TestCase):
         QuestionFactory.create_batch(10, type="sara")
 
     @patch("questions.tasks.WebClient")
-    def test_task_send_slack_message(self, mock_web_client):
+    def test_task_send_slack_message_success(self, mock_web_client):
         task_send_slack_message()
 
         now = timezone.now()
@@ -84,4 +85,19 @@ class task_send_slack_message_테스트(TestCase):
         mock_web_client.return_value.chat_postMessage.assert_called_once_with(
             channel="#데일리사용량",
             text=expect_text,
+        )
+
+    @patch("questions.tasks.WebClient")
+    @patch("questions.tasks.print")
+    def test_task_send_slack_message_slack_exception(self, mock_print, mock_web_client):
+        error_response = {"ok": False, "error": "invalid_auth"}
+        mock_web_client.return_value.chat_postMessage.side_effect = SlackApiError(
+            message="Slack API 에러",
+            response=error_response,
+        )
+
+        task_send_slack_message()
+
+        mock_print.assert_called_with(
+            f"Error sending message: {error_response['error']}"
         )
