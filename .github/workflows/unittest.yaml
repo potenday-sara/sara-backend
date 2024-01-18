@@ -55,6 +55,7 @@ jobs:
       BOOTSTRAP_SERVERS: ""
       COUPANG_API_KEY: ""
       COUPANG_API_SECRET: ""
+      SLACK_TOKEN: ""
 
     steps:
       - uses: actions/checkout@v3
