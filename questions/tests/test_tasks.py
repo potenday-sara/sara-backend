@@ -18,7 +18,7 @@ class task_get_answer_테스트(TestCase):
 
     @patch("questions.tasks.GPTService")
     @patch("questions.tasks.Answer.objects.create")
-    def test_task_get_answer_success(self, mock_create, mock_gpt_service):
+    def test_함수_호출_성공_시(self, mock_create, mock_gpt_service):
         mock_gpt_service.return_value.get_answer.return_value = "테스트 답변"
 
         # 작업 실행
@@ -35,7 +35,7 @@ class task_get_answer_테스트(TestCase):
 
     @patch("questions.tasks.GPTService")
     @patch("questions.tasks.print")
-    def test_task_get_answer_gpt_service_exception(self, mock_print, mock_gpt_service):
+    def test_GPT_에러_발생_시(self, mock_print, mock_gpt_service):
         mock_gpt_service.return_value.get_answer.side_effect = Exception("GPT 서비스 에러")
 
         task_get_answer(
@@ -47,9 +47,7 @@ class task_get_answer_테스트(TestCase):
     @patch("questions.tasks.GPTService")
     @patch("questions.tasks.Answer.objects.create")
     @patch("questions.tasks.print")
-    def test_task_get_answer_answer_create_exception(
-        self, mock_print, mock_create, mock_gpt_service
-    ):
+    def test_답변_생성중_에러_발생_시(self, mock_print, mock_create, mock_gpt_service):
         mock_gpt_service.return_value.get_answer.return_value = "테스트 답변"
         mock_create.side_effect = Exception("Answer 생성 에러")
 
@@ -67,7 +65,7 @@ class task_send_slack_message_테스트(TestCase):
         QuestionFactory.create_batch(10, type="sara")
 
     @patch("questions.tasks.WebClient")
-    def test_task_send_slack_message_success(self, mock_web_client):
+    def test_함수_호출_성공_시(self, mock_web_client):
         task_send_slack_message()
 
         now = timezone.now()
@@ -89,7 +87,7 @@ class task_send_slack_message_테스트(TestCase):
 
     @patch("questions.tasks.WebClient")
     @patch("questions.tasks.print")
-    def test_task_send_slack_message_slack_exception(self, mock_print, mock_web_client):
+    def test_슬랙_에러_발생_시(self, mock_print, mock_web_client):
         error_response = {"ok": False, "error": "invalid_auth"}
         mock_web_client.return_value.chat_postMessage.side_effect = SlackApiError(
             message="Slack API 에러",
