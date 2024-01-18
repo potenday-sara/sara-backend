@@ -1,9 +1,13 @@
 from unittest.mock import patch
 
+import freezegun
 from django.test import TestCase
+from django.utils import timezone
 
-from questions.tasks import task_get_answer
-from questions.tests.factories import AIFactory
+from questions.consts import QUESTION_SLACK_MESSAGE_TEMPLATE
+from questions.models import Question
+from questions.tasks import task_get_answer, task_send_slack_message
+from questions.tests.factories import AIFactory, QuestionFactory
 
 
 class task_get_answer_테스트(TestCase):
@@ -53,3 +57,31 @@ class task_get_answer_테스트(TestCase):
         )
 
         mock_print.assert_called_with("answer create error: Answer 생성 에러")
+
+
+@freezegun.freeze_time("2024-01-01")
+class task_send_slack_message_테스트(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        QuestionFactory.create_batch(10, type="sara")
+
+    @patch("questions.tasks.WebClient")
+    def test_task_send_slack_message(self, mock_web_client):
+        task_send_slack_message()
+
+        now = timezone.now()
+        d_1 = now - timezone.timedelta(days=1)
+        expect_text = QUESTION_SLACK_MESSAGE_TEMPLATE.format(
+            d_1.strftime("%Y-%m-%d"),
+            Question.objects.filter(created_at__range=(d_1, now)).count(),
+            Question.objects.filter(created_at__range=(d_1, now), type="sara").count(),
+            Question.objects.filter(created_at__range=(d_1, now), type="mara").count(),
+            Question.objects.all().count(),
+            Question.objects.filter(type="sara").count(),
+            Question.objects.filter(type="mara").count(),
+        )
+        mock_web_client.assert_called_once()
+        mock_web_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="#데일리사용량",
+            text=expect_text,
+        )

@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
+from datetime import datetime
+
 from celery import shared_task
 from django.conf import settings
 from django.utils import timezone
@@ -7,6 +9,7 @@ from slack import WebClient
 from slack.errors import SlackApiError
 
 from answers.models import Answer
+from questions.consts import QUESTION_SLACK_MESSAGE_TEMPLATE
 from questions.models import Question
 from questions.models.ai_models import AIType
 from questions.services import GPTService
@@ -41,22 +44,9 @@ def task_get_answer(key: str, value: dict) -> None:
 def task_send_slack_message():
     client = WebClient(token=settings.SLACK_TOKEN)
 
-    text_format = """
-    📅 *Daily*
-    
-    • *기간* : `{}` ~ `현재`
-        • *전체 질문 수* : `{}`
-        • *사라 질문 수* : `{}`
-        • *마라 질문 수* : `{}`
-        
-    • *누적 데이터*
-        • *전체 질문 수* : `{}`
-        • *사라 질문 수* : `{}`
-        • *마라 질문 수* : `{}`
-    """
-
     now = timezone.now()
-    d_1 = timezone.now() - timezone.timedelta(days=1)
+    d_1 = now - timezone.timedelta(days=1)
+
     daily_all_count = Question.objects.filter(created_at__range=(d_1, now)).count()
     daily_sara_count = Question.objects.filter(
         created_at__range=(d_1, now), type=AIType.SARA
@@ -69,7 +59,7 @@ def task_send_slack_message():
     sara_count = Question.objects.filter(type=AIType.SARA).count()
     mara_count = Question.objects.filter(type=AIType.MARA).count()
 
-    text = text_format.format(
+    text = QUESTION_SLACK_MESSAGE_TEMPLATE.format(
         d_1.strftime("%Y-%m-%d"),
         daily_all_count,
         daily_sara_count,

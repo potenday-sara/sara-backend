@@ -175,7 +175,7 @@ OPENAI_MODEL = "gpt-4-1106-preview"
 CELERY_BROKER_URL = "amqp://rabbitmq:5672/"
 CELERY_BEAT_SCHEDULE = {
     "send_slack_message_every_day": {
-        "task": "questions.tasks.send_slack_message",
+        "task": "questions.tasks.task_send_slack_message",
         "schedule": crontab(hour="9", minute="0"),  # 매일 오전 9시에 실행
     },
 }
