@@ -9,6 +9,7 @@ env:
   project: 'sara'
   backend: 'backend'
   service: 'service'
+  beat: 'beat'
 jobs:
   api-build:
     runs-on: ubuntu-latest
@@ -71,6 +72,37 @@ jobs:
           push: true
           tags: ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}:${{ steps.get_version.outputs.VERSION }}
 
+  beat-build:
+    runs-on: ubuntu-latest
+    outputs:
+      service-version: ${{ steps.get_version.outputs.VERSION }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Harbor
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.harbor-url }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.beat
+          push: true
+          tags: ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.beat }}:${{ steps.get_version.outputs.VERSION }}
+
   update-repo:
     needs: [ api-build, service-build ]
     runs-on: ubuntu-latest
@@ -90,6 +122,11 @@ jobs:
         run: |
           cd backend
           kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.service }}:${{ needs.service-build.outputs.service-version }}
+
+      - name: Update Beat image tag in deployment.yaml
+        run: |
+          cd backend
+          kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.beat }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.beat }}:${{ needs.service-build.outputs.service-version }}
 
       - name: Commit and push changes
         run: |

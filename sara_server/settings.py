@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 ENV = os.environ.get("ENV", "DEV")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -171,6 +173,14 @@ OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 OPENAI_MODEL = "gpt-4-1106-preview"
 
 CELERY_BROKER_URL = "amqp://rabbitmq:5672/"
+CELERY_BEAT_SCHEDULE = {
+    "send_slack_message_every_day": {
+        "task": "questions.tasks.send_slack_message",
+        "schedule": crontab(hour="9", minute="0"),  # 매일 오전 9시에 실행
+    },
+}
+
+SLACK_TOKEN = os.environ["SLACK_TOKEN"]
 
 COUPANG_API_KEY = os.environ["COUPANG_API_KEY"]
 COUPANG_API_SECRET = os.environ["COUPANG_API_SECRET"]
