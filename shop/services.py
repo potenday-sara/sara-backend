@@ -106,7 +106,7 @@ class CoupangAPI:
         return response_data
 
     def search_product(self, keyword: str):
-        url = f"/products/search"
+        url = "/products/search"
 
         querystring = {
             "keyword": keyword,

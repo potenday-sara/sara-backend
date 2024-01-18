@@ -1,8 +1,10 @@
 from unittest.mock import patch
 
 from django.test import TestCase
+from rest_framework.status import HTTP_200_OK, HTTP_429_TOO_MANY_REQUESTS
 from rest_framework.test import APIClient
 
+from shop.consts import SHOP_MAX_SEARCH_COUNT
 from shop.models import Category
 from shop.tests.factories import CategoryFactory
 
@@ -83,3 +85,42 @@ class Goods_목록_요청_테스트(TestCase):
 
         with self.subTest("상품 목록이 리턴된다."):
             self.assertTrue(len(response.data) >= 1)
+
+
+class Goods_검색_요청_테스트(TestCase):
+    url: str
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = "/shop/search/"
+
+    @patch("core.cache.Redis")
+    @patch("shop.views.CoupangAPI.search_product")
+    def test_검색_요청_성공_시(self, mock_search_product, mock_redis):
+        mock_redis.return_value.get.return_value = None
+
+        mock_search_product.return_value = [
+            {
+                "rank": 1,
+                "isRocket": True,
+                "isFreeShipping": True,
+                "productId": 1,
+                "productName": "테스트 상품",
+                "productPrice": 10000,
+                "productImage": "https://image.url",
+                "productUrl": "https://product.url",
+            }
+        ]
+
+        response = self.client.get(self.url, {"keyword": "테스트"})
+
+        self.assertEqual(response.status_code, HTTP_200_OK)
+        self.assertTrue(len(response.data) >= 1)
+
+    @patch("core.cache.Redis")
+    def test_요청_제한_초과시_429_에러_발생(self, mock_redis):
+        mock_redis.return_value.get.return_value = SHOP_MAX_SEARCH_COUNT
+
+        response = self.client.get(self.url, {"keyword": "테스트"})
+
+        self.assertEqual(response.status_code, HTTP_429_TOO_MANY_REQUESTS)

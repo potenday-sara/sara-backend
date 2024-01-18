@@ -3,16 +3,16 @@ from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.status import HTTP_429_TOO_MANY_REQUESTS
-from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from core.cache import RedisCache
 from shop.consts import SHOP_GOODS_LIST_TTL, SHOP_MAX_SEARCH_COUNT, SHOP_MAX_SEARCH_TTL
 from shop.models import Category
 from shop.serializers import (
+    CategoryGoodsSerializer,
     CategorySerializer,
     SearchGoodsSerializer,
     SearchRequestSerializer,
-    CategoryGoodsSerializer,
 )
 from shop.services import CoupangAPI
 
@@ -43,6 +43,10 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 class SearchAPIView(GenericViewSet, ListModelMixin):
     serializer_class = SearchGoodsSerializer
     pagination_class = None
+    queryset = None
+
+    def get_queryset(self):
+        pass  # pragma: no cover
 
     @swagger_auto_schema(query_serializer=SearchRequestSerializer)
     def list(self, request, *args, **kwargs):

@@ -136,3 +136,40 @@ class CouponAPI_테스트(TestCase):
 
         with self.subTest("json이 정상적으로 리턴된다."):
             self.assertEqual(response_data, {url: [] for url in urls})
+
+    @patch("shop.services.CoupangClient.request")
+    def test_search_product_함수_호출_시(self, mock_request):
+        coupang_data = [
+            {
+                "rank": 1,
+                "isRocket": True,
+                "isFreeShipping": True,
+                "productId": 1,
+                "productName": "테스트 상품",
+                "productPrice": 10000,
+                "productImage": "https://image.url",
+                "productUrl": "https://product.url",
+            }
+        ]
+
+        mock_request.return_value = mock_request.return_value
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.json.return_value = {
+            "data": {
+                "productData": coupang_data,
+            },
+        }
+        coupang_api = CoupangAPI()
+        response_data = coupang_api.search_product("test")
+
+        with self.subTest("request 함수가 정상적으로 호출된다."):
+            mock_request.assert_called_once_with(
+                method="GET",
+                url="/products/search",
+                params={
+                    "keyword": "test",
+                },
+            )
+
+        with self.subTest("json이 정상적으로 리턴된다."):
+            self.assertEqual(response_data, coupang_data)
