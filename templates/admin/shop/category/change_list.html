@@ -73,7 +73,13 @@ const data = {
 const config = {
   type: 'line',
   data: data,
-  options: {}
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
 };
 
 const dateCountChart = new Chart(
