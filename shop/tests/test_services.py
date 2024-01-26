@@ -113,7 +113,6 @@ class CouponAPI_테스트(TestCase):
     @freezegun.freeze_time("2024-01-01")
     @patch("shop.services.CoupangClient.request")
     def test_get_report_data_함수_호출_시(self, mock_request):
-        mock_request.return_value = mock_request.return_value
         mock_request.return_value.status_code = 200
         mock_request.return_value.json.return_value = {"data": []}
         coupang_api = CoupangAPI()
