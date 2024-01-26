@@ -32,7 +32,7 @@ jobs:
 
     - name: Get the version
       id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      run: echo VERSION=${GITHUB_REF#refs/tags/} >> $GITHUB_OUTPUT
 
     - name: Build and push
       uses: docker/build-push-action@v5
@@ -62,7 +62,7 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+        run: echo VERSION=${GITHUB_REF#refs/tags/} >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -93,7 +93,7 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+        run: echo VERSION=${GITHUB_REF#refs/tags/} >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout CD repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: potenday-sara/sara-resources
           token: ${{ secrets.CD_REPO_TOKEN }}
