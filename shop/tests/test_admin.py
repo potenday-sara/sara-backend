@@ -30,7 +30,7 @@ class CategoryAdminTest(TestCase):
 
         mock_request.return_value.status_code = 200
         mock_request.return_value.json.return_value = {
-            "data": [{"date": "2024-01-01", "click": 1}]
+            "data": [{"date": "20240101", "click": 1}]
         }
 
         qa = CategoryAdmin(Category, self.site)
@@ -45,5 +45,5 @@ class CategoryAdminTest(TestCase):
         self.assertIn("report_data", response.context_data)
         self.assertEqual(
             json.loads(response.context_data["report_data"])["clicks"][-1]["date"],
-            "2024-01-01",
+            "20240101",
         )

@@ -131,7 +131,7 @@ class CouponAPI_테스트(TestCase):
             current_date = start_date
 
             while current_date <= end_date:
-                formatted_date = current_date.strftime("%Y-%m-%d")
+                formatted_date = current_date.strftime("%Y%m%d")
                 except_date[url][formatted_date] = 0
                 current_date += timezone.timedelta(days=1)
 
