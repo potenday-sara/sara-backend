@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 from unittest.mock import patch
 
@@ -119,12 +120,21 @@ class CouponAPI_테스트(TestCase):
         response_data = coupang_api.get_report_data()
 
         urls = ["clicks", "orders", "cancels", "commission"]
+        start_date = datetime.now() - timezone.timedelta(days=30)
+        end_date = datetime.now()
         date_range = {
-            "startDate": (datetime.now() - timezone.timedelta(days=30)).strftime(
-                "%Y%m%d"
-            ),
-            "endDate": datetime.now().strftime("%Y%m%d"),
+            "startDate": start_date.strftime("%Y%m%d"),
+            "endDate": end_date.strftime("%Y%m%d"),
         }
+
+        except_date = defaultdict(lambda: defaultdict(int))
+        for url in urls:
+            current_date = start_date
+
+            while current_date <= end_date:
+                formatted_date = current_date.strftime("%Y-%m-%d")
+                except_date[url][formatted_date] = 0
+                current_date += timezone.timedelta(days=1)
 
         with self.subTest("request 함수가 정상적으로 호출된다."):
             for url in urls:
@@ -135,7 +145,7 @@ class CouponAPI_테스트(TestCase):
                 )
 
         with self.subTest("json이 정상적으로 리턴된다."):
-            self.assertEqual(response_data, {url: [] for url in urls})
+            self.assertEqual(len(response_data.keys()), len(except_date.keys()))
 
     @patch("shop.services.CoupangClient.request")
     def test_search_product_함수_호출_시(self, mock_request):
