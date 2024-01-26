@@ -30,16 +30,16 @@ const dateLabel = clickDatas.map(entry => {
     const day = entry.date.substring(6, 8);
     return `${year}-${month}-${day}`;
 });
-const clickDataPoints = clickDatas.map(entry => entry.click);
+const clickDataPoints = clickDatas.map(entry => entry.count);
 
 const cancelDatas = coupangReportData.cancels;
-const cancelDataPoints = cancelDatas.map(entry => entry.click);
+const cancelDataPoints = cancelDatas.map(entry => entry.count);
 
 const commissionDatas = coupangReportData.commission;
-const commissionDataPoints = commissionDatas.map(entry => entry.click);
+const commissionDataPoints = commissionDatas.map(entry => entry.count);
 
 const orderCounts = coupangReportData.orders;
-const orderDataPoints = orderCounts.map(entry => entry.click);
+const orderDataPoints = orderCounts.map(entry => entry.count);
 
 // Chart.js를 사용하여 그래프를 그립니다.
 const data = {

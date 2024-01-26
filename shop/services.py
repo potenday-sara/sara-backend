@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+from collections import defaultdict
 from datetime import datetime
 from time import gmtime, strftime
 from urllib.parse import urlencode
@@ -103,7 +104,29 @@ class CoupangAPI:
             for url in urls
         }
 
-        return response_data
+        response_summary = defaultdict(lambda: defaultdict(int))
+        for url in urls:
+            current_date = start_date
+            while current_date <= end_date:
+                formatted_date = current_date.strftime("%Y-%m-%d")
+                response_summary[url][formatted_date] = 0
+                current_date += timezone.timedelta(days=1)
+
+        result = {}
+        for key, data_list in response_data.items():
+            for data in data_list:
+                date = data["date"]
+                if key == "clicks":
+                    response_summary[key][date] += data["click"]
+                else:
+                    response_summary[key][date] += 1
+
+            result[key] = [
+                {"date": date, "count": count}
+                for date, count in response_summary[key].items()
+            ]
+
+        return result
 
     def search_product(self, keyword: str):
         url = "/products/search"
