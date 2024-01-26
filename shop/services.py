@@ -108,7 +108,7 @@ class CoupangAPI:
         for url in urls:
             current_date = start_date
             while current_date <= end_date:
-                formatted_date = current_date.strftime("%Y-%m-%d")
+                formatted_date = current_date.strftime("%Y%m%d")
                 response_summary[url][formatted_date] = 0
                 current_date += timezone.timedelta(days=1)
 
