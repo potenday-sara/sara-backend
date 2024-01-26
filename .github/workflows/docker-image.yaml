@@ -4,12 +4,14 @@ on:
   push:
     tags:
       - 'v*'
+
 env:
   harbor-url: 'harbor.sara-mara.com'
   project: 'sara'
   backend: 'backend'
   service: 'service'
   beat: 'beat'
+
 jobs:
   api-build:
     runs-on: ubuntu-latest
@@ -32,7 +34,7 @@ jobs:
 
     - name: Get the version
       id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
     - name: Build and push
       uses: docker/build-push-action@v5
@@ -62,7 +64,7 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -75,7 +77,7 @@ jobs:
   beat-build:
     runs-on: ubuntu-latest
     outputs:
-      service-version: ${{ steps.get_version.outputs.VERSION }}
+      beat-version: ${{ steps.get_version.outputs.VERSION }}
 
     steps:
       - name: Checkout code
@@ -93,7 +95,7 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -108,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout CD repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: potenday-sara/sara-resources
           token: ${{ secrets.CD_REPO_TOKEN }}
@@ -126,12 +128,12 @@ jobs:
       - name: Update Beat image tag in deployment.yaml
         run: |
           cd backend
-          kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.beat }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.beat }}:${{ needs.service-build.outputs.service-version }}
+          kustomize edit set image ${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.beat }}=${{ env.harbor-url }}/${{ env.project }}/${{ env.backend }}/${{ env.beat }}:${{ needs.beat-build.outputs.beat-version }}
 
       - name: Commit and push changes
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Update image tags to API:${{ needs.api-build.outputs.api-version }} Service:${{ needs.service-build.outputs.service-version }}"
+          git commit -m "Update image tags to API:${{ needs.api-build.outputs.api-version }} Service:${{ needs.service-build.outputs.service-version }} Beat:${{ needs.beat-build.outputs.beat-version }}"
           git push
