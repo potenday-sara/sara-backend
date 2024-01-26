@@ -1,3 +1,4 @@
+import json
 from unittest.mock import MagicMock, patch
 
 import freezegun
@@ -28,7 +29,9 @@ class CategoryAdminTest(TestCase):
         mock_redis.return_value.get.return_value = None
 
         mock_request.return_value.status_code = 200
-        mock_request.return_value.json.return_value = {"data": []}
+        mock_request.return_value.json.return_value = {
+            "data": [{"date": "2024-01-01", "click": 1}]
+        }
 
         qa = CategoryAdmin(Category, self.site)
 
@@ -40,3 +43,7 @@ class CategoryAdminTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("report_data", response.context_data)
+        self.assertEqual(
+            json.loads(response.context_data["report_data"])["clicks"][-1]["date"],
+            "2024-01-01",
+        )
