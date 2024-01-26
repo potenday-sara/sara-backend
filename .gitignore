@@ -263,3 +263,5 @@ fabric.properties
 .husky
 node_modules
 package-lock.json
+
+static
