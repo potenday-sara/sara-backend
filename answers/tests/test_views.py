@@ -21,6 +21,9 @@ class AnswerView_테스트(TestCase):
         with self.subTest("답변이 리턴된다."):
             self.assertEqual(response.data["id"], str(self.answer.id))
             self.assertEqual(
+                response.data["question"], str(self.answer.question.content)
+            )
+            self.assertEqual(
                 response.data["product"], str(self.answer.question.product)
             )
 
