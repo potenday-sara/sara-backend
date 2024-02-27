@@ -91,7 +91,7 @@ class QuestionViewSet(
             serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data)
 
-        elif request.method == "POST":
+        if request.method == "POST":
             question = self.get_object()
             serializer = CommentSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -117,7 +117,7 @@ class QuestionViewSet(
                 Like.objects.create(question=question)
 
             return Response(status=status.HTTP_201_CREATED)
-        elif request.method == "DELETE":
+        if request.method == "DELETE":
             question = self.get_object()
             with transaction.atomic():
                 question.like_count = F("like_count") - 1
