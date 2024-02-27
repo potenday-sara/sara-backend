@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 from answers.models import Answer
 from answers.tests.factories import AnswerFactory
 from questions.consts import QUESTION_LIST_MAX_LENGTH
-from questions.models import Feedback, QuestionFeedback
+from questions.models import Comment, Feedback, Like, QuestionFeedback
 from questions.tests.factories import AIFactory, QuestionFactory
 
 
@@ -84,3 +84,54 @@ class QuestionsView_테스트(TestCase):
 
         with self.subTest("feedback 데이터가 생성된다"):
             self.assertEqual(Feedback.objects.count(), 1)
+
+    def test_comments_조회_요청_성공_시(self):
+        Comment.objects.create(
+            question=self.question_list[0], content="test", nickname="test"
+        )
+
+        response = self.client.get(
+            self.url + f"{self.question_list[0].id}" + "/comments/"
+        )
+        with self.subTest("status code 200이 리턴된다."):
+            self.assertEqual(response.status_code, 200)
+        with self.subTest("comments 데이터가 리턴된다"):
+            self.assertTrue(len(response.data) >= 1)
+
+    def test_comments_등록_요청_성공_시(self):
+        response = self.client.post(
+            self.url + f"{self.question_list[0].id}" + "/comments/",
+            data={
+                "content": "test",
+                "nickname": "test",
+            },
+        )
+        with self.subTest("status code 201이 리턴된다."):
+            self.assertEqual(response.status_code, 201)
+        with self.subTest("comments 데이터가 생성된다"):
+            self.assertEqual(
+                Comment.objects.filter(question=self.question_list[0]).count(), 1
+            )
+
+    def test_like_요청_성공_시(self):
+        response = self.client.post(self.url + f"{self.question_list[0].id}" + "/like/")
+        with self.subTest("status code 201이 리턴된다."):
+            self.assertEqual(response.status_code, 201)
+        with self.subTest("like 데이터가 생성된다"):
+            self.assertEqual(
+                Like.objects.filter(question=self.question_list[0]).count(), 1
+            )
+
+    def test_like_제거_요청_성공_시(self):
+        Like.objects.create(question=self.question_list[0])
+
+        response = self.client.delete(
+            self.url + f"{self.question_list[0].id}" + "/like/",
+            data={"question": self.question_list[0].id},
+        )
+        with self.subTest("status code 204가 리턴된다."):
+            self.assertEqual(response.status_code, 204)
+        with self.subTest("like 데이터가 제거된다"):
+            self.assertEqual(
+                Like.objects.filter(question=self.question_list[0]).count(), 0
+            )
