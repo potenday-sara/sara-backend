@@ -31,7 +31,7 @@ class QuestionViewSet(
     serializer_class = QuestionSerializer
     pagination_class = None
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs) -> Response:
         queryset = self.filter_queryset(self.get_queryset())
 
         queryset = (
@@ -46,7 +46,7 @@ class QuestionViewSet(
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -60,7 +60,7 @@ class QuestionViewSet(
         )
 
     @action(detail=True, methods=["post"], serializer_class=QuestionFeedbackSerializer)
-    def feedback(self, request, *args, **kwargs):
+    def feedback(self, request, *args, **kwargs) -> Response:
         question = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -71,7 +71,7 @@ class QuestionViewSet(
         return Response(status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["post"], serializer_class=FeedbackSerializer)
-    def cs(self, request, *args, **kwargs):
+    def cs(self, request, *args, **kwargs) -> Response:
         question = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -84,7 +84,7 @@ class QuestionViewSet(
         serializer_class=CommentSerializer,
         url_path="comments",
     )
-    def comments(self, request, *args, **kwargs):
+    def comments(self, request, *args, **kwargs) -> Response | None:
         if request.method == "GET":
             question = self.get_object()
             comments = question.comment_set.all()
@@ -101,6 +101,7 @@ class QuestionViewSet(
                 question.comment_count = F("comment_count") + 1
                 question.save(update_fields=["comment_count"])
             return Response(status=status.HTTP_201_CREATED)
+        return None
 
     @action(
         detail=True,
@@ -108,7 +109,7 @@ class QuestionViewSet(
         url_path="like",
         serializer_class=Serializer,
     )
-    def like(self, request, *args, **kwargs):
+    def like(self, request, *args, **kwargs) -> Response | None:
         if request.method == "POST":
             question = self.get_object()
             with transaction.atomic():
@@ -126,3 +127,4 @@ class QuestionViewSet(
                     like.delete()
 
             return Response(status=status.HTTP_204_NO_CONTENT)
+        return None
