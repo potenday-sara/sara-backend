@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from questions.models import Feedback, Question, QuestionFeedback
+from questions.models import Comment, Feedback, Question, QuestionFeedback
 
 
 class QuestionSerializer(ModelSerializer):
     answer = serializers.PrimaryKeyRelatedField(read_only=True)
+    like_count = serializers.IntegerField(read_only=True)
+    comment_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Question
@@ -15,6 +17,8 @@ class QuestionSerializer(ModelSerializer):
             "product",
             "type",
             "answer",
+            "like_count",
+            "comment_count",
         )
 
 
@@ -49,4 +53,14 @@ class QuestionDateCountSerializer(ModelSerializer):
         fields = (
             "date",
             "count",
+        )
+
+
+class CommentSerializer(ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "content",
+            "nickname",
         )
