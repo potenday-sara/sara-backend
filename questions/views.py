@@ -31,7 +31,7 @@ class QuestionViewSet(
     serializer_class = QuestionSerializer
     pagination_class = None
 
-    def list(self, request, *args, **kwargs) -> Response:
+    def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
         queryset = (
@@ -46,7 +46,7 @@ class QuestionViewSet(
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def create(self, request, *args, **kwargs) -> Response:
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -60,7 +60,7 @@ class QuestionViewSet(
         )
 
     @action(detail=True, methods=["post"], serializer_class=QuestionFeedbackSerializer)
-    def feedback(self, request, *args, **kwargs) -> Response:
+    def feedback(self, request, *args, **kwargs):
         question = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -71,7 +71,7 @@ class QuestionViewSet(
         return Response(status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["post"], serializer_class=FeedbackSerializer)
-    def cs(self, request, *args, **kwargs) -> Response:
+    def cs(self, request, *args, **kwargs):
         question = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -80,51 +80,50 @@ class QuestionViewSet(
 
     @action(
         detail=True,
-        methods=["get", "post"],
+        methods=["get"],
         serializer_class=CommentSerializer,
         url_path="comments",
     )
-    def comments(self, request, *args, **kwargs) -> Response | None:
-        if request.method == "GET":
-            question = self.get_object()
-            comments = question.comment_set.all()
-            serializer = CommentSerializer(comments, many=True)
-            return Response(serializer.data)
+    def comments(self, request, *args, **kwargs):
+        question = self.get_object()
+        comments = question.comment_set.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
 
-        if request.method == "POST":
-            question = self.get_object()
-            serializer = CommentSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+    @comments.mapping.post
+    def add_comment(self, request, *args, **kwargs):
+        question = self.get_object()
+        serializer = CommentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-            with transaction.atomic():
-                serializer.save(question=question)
-                question.comment_count = F("comment_count") + 1
-                question.save(update_fields=["comment_count"])
-            return Response(status=status.HTTP_201_CREATED)
-        return None
+        with transaction.atomic():
+            serializer.save(question=question)
+            question.comment_count = F("comment_count") + 1
+            question.save(update_fields=["comment_count"])
+        return Response(status=status.HTTP_201_CREATED)
 
     @action(
         detail=True,
-        methods=["post", "delete"],
+        methods=["post"],
         url_path="like",
         serializer_class=Serializer,
     )
-    def like(self, request, *args, **kwargs) -> Response | None:
-        if request.method == "POST":
-            question = self.get_object()
-            with transaction.atomic():
-                question.like_count = F("like_count") + 1
-                question.save(update_fields=["like_count"])
-                Like.objects.create(question=question)
+    def like(self, request, *args, **kwargs):
+        question = self.get_object()
+        with transaction.atomic():
+            question.like_count = F("like_count") + 1
+            question.save(update_fields=["like_count"])
+            Like.objects.create(question=question)
 
             return Response(status=status.HTTP_201_CREATED)
-        if request.method == "DELETE":
-            question = self.get_object()
-            with transaction.atomic():
-                question.like_count = F("like_count") - 1
-                question.save(update_fields=["like_count"])
-                if like := Like.objects.filter(question=question).last():
-                    like.delete()
 
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return None
+    @like.mapping.delete
+    def unlike(self, request, *args, **kwargs):
+        question = self.get_object()
+        with transaction.atomic():
+            question.like_count = F("like_count") - 1
+            question.save(update_fields=["like_count"])
+            if like := Like.objects.filter(question=question).last():
+                like.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
