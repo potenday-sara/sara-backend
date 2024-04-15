@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from core.serializers import RequestSerializer
 from questions.models import Comment, Feedback, Question, QuestionFeedback
 
 
-class QuestionListRequestParamsSerializer(serializers.Serializer):
+class QuestionListRequestParamsSerializer(RequestSerializer):
     order = serializers.ChoiceField(
         choices=[("time", "time"), ("like", "like")],
         default="time",
@@ -13,12 +14,6 @@ class QuestionListRequestParamsSerializer(serializers.Serializer):
         choices=[("all", "all"), ("sara", "sara"), ("mara", "mara")],
         default="all",
     )
-
-    def create(self, validated_data):
-        return None
-
-    def update(self, instance, validated_data):
-        return None
 
 
 class QuestionSerializer(ModelSerializer):
