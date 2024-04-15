@@ -4,6 +4,17 @@ from rest_framework.serializers import ModelSerializer
 from questions.models import Comment, Feedback, Question, QuestionFeedback
 
 
+class QuestionListRequestParamsSerializer(serializers.Serializer):
+    order = serializers.ChoiceField(
+        choices=[("time", "time"), ("like", "like")],
+        default="time",
+    )
+    type = serializers.ChoiceField(
+        choices=[("all", "all"), ("sara", "sara"), ("mara", "mara")],
+        default="all",
+    )
+
+
 class QuestionSerializer(ModelSerializer):
     answer = serializers.PrimaryKeyRelatedField(read_only=True)
     like_count = serializers.IntegerField(read_only=True)
@@ -19,6 +30,7 @@ class QuestionSerializer(ModelSerializer):
             "answer",
             "like_count",
             "comment_count",
+            "created_at",
         )
 
 
