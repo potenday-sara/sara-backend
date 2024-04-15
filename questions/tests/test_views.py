@@ -32,13 +32,16 @@ class QuestionsView_테스트(TestCase):
 
         with self.subTest("status code 200이 리턴된다."):
             self.assertEqual(response.status_code, 200)
+
         with self.subTest("질문 목록이 리턴된다."):
             self.assertTrue(len(self.question_list) >= 1)
+
         with self.subTest("히든 처리된 질문은 제외된다."):
             self.assertNotIn(
                 self.question_list[0].id,
                 map(lambda x: x["id"], response_data["results"]),
             )
+
         with self.subTest("답변이 체크된 질문만 리턴된다."):
             self.assertTrue(
                 all(
@@ -48,6 +51,7 @@ class QuestionsView_테스트(TestCase):
                     )
                 )
             )
+
         with self.subTest("전달한 order에 따라 정렬된다."):
             self.question_list[-1].like_count = 100
             self.question_list[-1].save()
@@ -86,6 +90,16 @@ class QuestionsView_테스트(TestCase):
             response = self.client.get(self.url, data={"type": "mara"})
             response_data = response.json()
             self.assertEqual(len(response_data["results"]), 0)
+
+        with self.subTest("patinated_queryset 이 None일 경우 전체 데이터를 리턴한다."):
+            with patch("questions.views.QuestionViewSet.paginate_queryset") as mock:
+                mock.return_value = None
+                self.question_list[0].hidden = False
+                self.question_list[0].save()
+
+                response = self.client.get(self.url)
+                response_data = response.json()
+                self.assertTrue(len(response_data) == len(self.question_list))
 
     def test_questions_random_조회_요청_성공_시(self):
         self.question_list[0].hidden = True

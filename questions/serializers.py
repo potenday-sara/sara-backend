@@ -14,6 +14,12 @@ class QuestionListRequestParamsSerializer(serializers.Serializer):
         default="all",
     )
 
+    def create(self, validated_data):
+        ...
+
+    def update(self, instance, validated_data):
+        ...
+
 
 class QuestionSerializer(ModelSerializer):
     answer = serializers.PrimaryKeyRelatedField(read_only=True)
