@@ -1,9 +1,11 @@
 from django.db import transaction
 from django.db.models import F
 from django.db.models.functions import Random
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -14,6 +16,7 @@ from questions.serializers import (
     CommentSerializer,
     FeedbackSerializer,
     QuestionFeedbackSerializer,
+    QuestionListRequestParamsSerializer,
     QuestionSerializer,
 )
 from questions.tasks import task_get_answer
@@ -23,15 +26,52 @@ class QuestionViewSet(
     ReadOnlyModelViewSet,
     CreateModelMixin,
 ):
+    class QuestionLimitOffsetPagination(LimitOffsetPagination):
+        default_limit = 30
+
     queryset = (
         Question.objects.select_related("answer")
         .prefetch_related("comment_set", "like_set")
         .all()
     )
     serializer_class = QuestionSerializer
-    pagination_class = None
+    pagination_class = QuestionLimitOffsetPagination
 
+    @swagger_auto_schema(query_serializer=QuestionListRequestParamsSerializer)
     def list(self, request, *args, **kwargs):
+        request_serializer = QuestionListRequestParamsSerializer(
+            data=request.query_params
+        )
+        request_serializer.is_valid(raise_exception=True)
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        queryset = queryset.filter(
+            hidden=False,
+            answer__checked=True,
+        )
+        if request_serializer.validated_data["type"] != "all":
+            queryset = queryset.filter(type=request_serializer.validated_data["type"])
+
+        if request_serializer.validated_data["order"] == "like":
+            queryset = queryset.order_by("-like_count")
+        else:
+            queryset = queryset.order_by("-created_at")
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(
+        detail=False,
+        methods=["get"],
+    )
+    def random(self, request, *args, **kwargs):
+        self.pagination_class = None
         queryset = self.filter_queryset(self.get_queryset())
 
         queryset = (

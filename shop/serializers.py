@@ -1,6 +1,7 @@
 from rest_framework.fields import BooleanField, CharField, IntegerField
-from rest_framework.serializers import ModelSerializer, Serializer
+from rest_framework.serializers import ModelSerializer
 
+from core.serializers import RequestSerializer
 from shop.models import Category
 
 
@@ -14,7 +15,7 @@ class CategorySerializer(ModelSerializer):
         )
 
 
-class GoodsSerializer(Serializer):
+class GoodsSerializer(RequestSerializer):
     is_rocket = BooleanField(source="isRocket")
     is_free_shipping = BooleanField(source="isFreeShipping")
     product_id = IntegerField(source="productId")
@@ -22,12 +23,6 @@ class GoodsSerializer(Serializer):
     product_name = CharField(source="productName")
     product_price = IntegerField(source="productPrice")
     product_url = CharField(source="productUrl")
-
-    def create(self, validated_data):  # pragma: no cover
-        pass
-
-    def update(self, instance, validated_data):  # pragma: no cover
-        pass
 
 
 class CategoryGoodsSerializer(GoodsSerializer):
@@ -38,11 +33,5 @@ class SearchGoodsSerializer(GoodsSerializer):
     rank = IntegerField()
 
 
-class SearchRequestSerializer(Serializer):
+class SearchRequestSerializer(RequestSerializer):
     keyword = CharField(required=True)
-
-    def create(self, validated_data):  # pragma: no cover
-        pass
-
-    def update(self, instance, validated_data):  # pragma: no cover
-        pass

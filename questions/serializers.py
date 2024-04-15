@@ -1,7 +1,19 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from core.serializers import RequestSerializer
 from questions.models import Comment, Feedback, Question, QuestionFeedback
+
+
+class QuestionListRequestParamsSerializer(RequestSerializer):
+    order = serializers.ChoiceField(
+        choices=[("time", "time"), ("like", "like")],
+        default="time",
+    )
+    type = serializers.ChoiceField(
+        choices=[("all", "all"), ("sara", "sara"), ("mara", "mara")],
+        default="all",
+    )
 
 
 class QuestionSerializer(ModelSerializer):
@@ -19,6 +31,7 @@ class QuestionSerializer(ModelSerializer):
             "answer",
             "like_count",
             "comment_count",
+            "created_at",
         )
 
 
