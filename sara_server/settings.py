@@ -170,7 +170,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
-OPENAI_MODEL = "gpt-4-1106-preview"
+OPENAI_MODEL = "gpt-4o-2024-05-13"
 
 CELERY_BROKER_URL = "amqp://rabbitmq:5672/"
 CELERY_BEAT_SCHEDULE = {
