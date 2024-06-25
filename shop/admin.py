@@ -9,10 +9,10 @@ from shop.services import CoupangAPI
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    fields = ["code", "name"]
-    list_display = ["code", "name"]
-    search_fields = ["code", "name"]
-    list_display_links = ["code", "name"]
+    fields = ["code", "type", "name"]
+    list_display = ["code", "type", "name"]
+    search_fields = ["code", "type", "name"]
+    list_display_links = ["code", "type", "name"]
 
     def changelist_view(self, request, extra_context=None):
         cache_key = "shop:report"

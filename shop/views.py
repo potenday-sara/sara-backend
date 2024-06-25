@@ -15,10 +15,11 @@ from shop.serializers import (
     SearchRequestSerializer,
 )
 from shop.services import CoupangAPI
+from shop.models import ShopType
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.filter(type=ShopType.COUPANG)
     serializer_class = CategorySerializer
     pagination_class = None
 
