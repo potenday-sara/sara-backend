@@ -7,7 +7,7 @@ from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from core.cache import RedisCache
 from shop.consts import SHOP_GOODS_LIST_TTL, SHOP_MAX_SEARCH_COUNT, SHOP_MAX_SEARCH_TTL
-from shop.models import Category
+from shop.models import Category, ShopType
 from shop.serializers import (
     CategoryGoodsSerializer,
     CategorySerializer,
@@ -15,7 +15,6 @@ from shop.serializers import (
     SearchRequestSerializer,
 )
 from shop.services import CoupangAPI
-from shop.models import ShopType
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
