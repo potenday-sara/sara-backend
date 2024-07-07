@@ -10,30 +10,62 @@ from shop.consts import SHOP_GOODS_LIST_TTL, SHOP_MAX_SEARCH_COUNT, SHOP_MAX_SEA
 from shop.models import Category, ShopType
 from shop.serializers import (
     CategoryGoodsSerializer,
+    CategoryListRequestParamSerializer,
     CategorySerializer,
     SearchGoodsSerializer,
     SearchRequestSerializer,
 )
-from shop.services import CoupangAPI
+from shop.services import AliExpressAPI, CoupangAPI
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
-    queryset = Category.objects.filter(type=ShopType.COUPANG)
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = None
 
+    @swagger_auto_schema(query_serializer=CategoryListRequestParamSerializer)
+    def list(self, request, *args, **kwargs):
+        request_serializer = CategoryListRequestParamSerializer(
+            data=request.query_params
+        )
+
+        request_serializer.is_valid(raise_exception=True)
+
+        queryset = self.filter_queryset(self.get_queryset())
+        category_type = (
+            ShopType.COUPANG
+            if request_serializer.validated_data["language"] == "KO"
+            else ShopType.ALIEXPRESS
+        )
+        queryset = queryset.filter(type=category_type)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    @swagger_auto_schema(query_serializer=CategoryListRequestParamSerializer)
     @action(detail=True, methods=["GET"], serializer_class=CategoryGoodsSerializer)
     def goods(self, request, *args, **kwargs):
         category = self.get_object()
 
-        cache_key = f"shop:category:goods:{category.code}"
+        request_serializer = CategoryListRequestParamSerializer(
+            data=request.query_params
+        )
+        request_serializer.is_valid(raise_exception=True)
+
+        cache_key = f"shop:category:goods:{category.type}:{category.code}"
         cached_data = RedisCache().fetch_per_cache(
             key=cache_key,
             ttl=SHOP_GOODS_LIST_TTL,
             beta=1,
             force_recompute=True,
-            recompute_function=CoupangAPI().get_product_list,
+            recompute_function=(
+                CoupangAPI().get_product_list
+                if category.type == ShopType.COUPANG
+                else AliExpressAPI().get_product_list
+            ),
             category_code=category.code,
+            language=request_serializer.validated_data["language"],
         )
 
         serializer = self.get_serializer(cached_data, many=True)
@@ -64,8 +96,13 @@ class SearchAPIView(GenericViewSet, ListModelMixin):
         request_serializer.is_valid(raise_exception=True)
 
         RedisCache().redis_client.incr(cache_key)
-        search_data = CoupangAPI().search_product(
-            keyword=request_serializer.validated_data.get("keyword")
+        kw = request_serializer.validated_data.get("keyword")
+        search_data = (
+            CoupangAPI().search_product(keyword=kw)
+            if request_serializer.validated_data["language"] == "KO"
+            else AliExpressAPI().get_product_list(
+                keywords=kw, language=request_serializer.validated_data["language"]
+            )
         )
         serializer = self.get_serializer(search_data, many=True)
         return Response(serializer.data)
