@@ -186,3 +186,8 @@ COUPANG_API_KEY = os.environ["COUPANG_API_KEY"]
 COUPANG_API_SECRET = os.environ["COUPANG_API_SECRET"]
 COUPANG_API_HOST = "https://api-gateway.coupang.com"
 COUPANG_API_BASE_PATH = "/v2/providers/affiliate_open_api/apis/openapi/v1"
+
+ALIEXPRESS_API_KEY = os.environ["ALIEXPRESS_API_KEY"]
+ALIEXPRESS_API_SECRET = os.environ["ALIEXPRESS_API_SECRET"]
+ALIEXPRESS_API_TRACKING_ID = os.environ["ALIEXPRESS_API_TRACKING_ID"]
+

@@ -1,10 +1,12 @@
 import hashlib
 import hmac
+import traceback
 from collections import defaultdict
 from datetime import datetime
 from time import gmtime, strftime
 from urllib.parse import urlencode
 
+from aliexpress_api import AliexpressApi, models
 from django.conf import settings
 from django.utils import timezone
 from requests import Session
@@ -63,7 +65,7 @@ class CoupangAPI:
     def __init__(self):
         self.client = CoupangClient()
 
-    def get_product_list(self, category_code, limit=32):
+    def get_product_list(self, category_code, limit=32, language="KO"):
         url = f"/products/bestcategories/{category_code}"
 
         querystring = {
@@ -142,3 +144,64 @@ class CoupangAPI:
         ).json()
 
         return response_data["data"]["productData"]
+
+
+class AliExpressAPI:
+    def __init__(self):
+        self.api_key = settings.ALIEXPRESS_API_KEY
+        self.api_secret = settings.ALIEXPRESS_API_SECRET
+        self.tracking_id = settings.ALIEXPRESS_API_TRACKING_ID
+        self.language = models.Language.KO
+        self.currency = models.Currency.KRW
+
+    def __get_product_list(self, category_code, keywords, limit=32):
+        try:
+            self.client = AliexpressApi(
+                self.api_key,
+                self.api_secret,
+                self.language,
+                self.currency,
+                self.tracking_id,
+            )
+
+            hotproducts = self.client.get_hotproducts(
+                category_ids=[category_code],
+                keywords=keywords,
+                page_size=limit,
+            )
+        except Exception as e:
+            print(f"failed to get hostproducts: {e}")
+            traceback.print_exc()
+            return []
+        p_list = getattr(hotproducts, "products")
+        result = []
+        for p in p_list:
+            result.append(
+                {
+                    "productId": getattr(p, "product_id"),
+                    "productImage": getattr(p, "product_main_image_url"),
+                    "productName": getattr(p, "product_title"),
+                    "productPrice": getattr(p, "target_app_sale_price"),
+                    "productUrl": getattr(p, "promotion_link"),
+                    "productPriceCurrency": getattr(
+                        p, "target_app_sale_price_currency"
+                    ),
+                }
+            )
+
+        return result
+
+    def get_product_list(self, language="KO", category_code="", keywords=""):
+        language_mapping = {
+            "KO": models.Language.KO,
+            "EN": models.Language.EN,
+            "JA": models.Language.JA,
+        }
+        currency_mapping = {
+            "KO": models.Currency.KRW,
+            "EN": models.Currency.USD,
+            "JA": models.Currency.JPY,
+        }
+        self.language = language_mapping.get(language, language_mapping["KO"])
+        self.currency = currency_mapping.get(language, currency_mapping["KO"])
+        return self.__get_product_list(category_code, keywords)
