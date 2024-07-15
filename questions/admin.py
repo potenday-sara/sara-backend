@@ -11,13 +11,14 @@ from questions.serializers import QuestionDateCountSerializer
 
 
 class AIAdmin(admin.ModelAdmin):
-    fields = ["type", "instruction"]
+    fields = ["type", "language", "instruction"]
     list_display = [
         "type",
+        "language",
         "created_at",
         "updated_at",
     ]
-    list_display_links = ["type"]
+    list_display_links = ["type", "language"]
     readonly_fields = ["created_at", "updated_at"]
 
 
@@ -61,10 +62,11 @@ class FeedbackInline(admin.StackedInline):
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    fields = ["type", "content", "product", "hidden"]
+    fields = ["type", "language", "content", "product", "hidden"]
     ordering = ["-created_at"]
     list_display = [
         "type",
+        "language",
         "content",
         "product",
         "hidden",

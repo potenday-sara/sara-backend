@@ -52,6 +52,9 @@ class QuestionViewSet(
         )
         if request_serializer.validated_data["type"] != "all":
             queryset = queryset.filter(type=request_serializer.validated_data["type"])
+		
+        if request_serializer.validated_data["language"] != "all":
+            queryset = queryset.filter(type=request_serializer.validated_data["language"])
 
         if request_serializer.validated_data["order"] == "like":
             queryset = queryset.order_by("-like_count")
@@ -65,7 +68,7 @@ class QuestionViewSet(
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
+    #random하게 사용하나 ?
     @action(
         detail=False,
         methods=["get"],

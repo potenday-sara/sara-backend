@@ -14,9 +14,9 @@ class RankViewSet(GenericViewSet, ListModelMixin):
         serializer = self.get_serializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         ai_type = serializer.validated_data["type"]
-
+        language_type = serializer.validated_data["language"]
         rank = (
-            Question.objects.filter(type=ai_type)
+            Question.objects.filter(type=ai_type, language=language_type)
             .values("product")
             .annotate(total=Count("id"))
             .annotate(rank=Window(expression=Rank(), order_by=F("total").desc()))
