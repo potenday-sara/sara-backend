@@ -16,13 +16,14 @@ from questions.services import GPTService
 @shared_task
 def task_get_answer(key: str, value: dict) -> None:
     ai_type = value["type"]
+    language_type = value["language"]
     product = value["product"]
     content = value["content"]
     question_id = key
 
     print("gpt answer start")
     try:
-        gpt_service = GPTService(ai_type=ai_type)
+        gpt_service = GPTService(ai_type=ai_type, language_type=language_type)
         answer = gpt_service.get_answer(product=product, question=content)
         print(f"gpt answer: {answer}")
     except Exception as e:  # pylint: disable=broad-except

@@ -7,7 +7,7 @@ from questions.models import AI
 class GPTService:
     MODEL = settings.OPENAI_MODEL
 
-    def __init__(self, ai_type: str):
+    def __init__(self, ai_type: str, language_type: str):
         self.client = OpenAI()
 
         self.model = self.MODEL
@@ -15,7 +15,9 @@ class GPTService:
         self.roles = [
             {
                 "role": "system",
-                "content": AI.objects.get(type=ai_type).instruction,
+                "content": AI.objects.get(
+                    type=ai_type, language=language_type
+                ).instruction,
             }
         ]
         self.message_template = "[구매 조언 요청 형식]\n상품:%s\n고민하고 있는 이유:%s"

@@ -14,7 +14,9 @@ class LanguageType(models.TextChoices):
 
 class AI(CommonModel):
     type = models.CharField(max_length=4, choices=AIType.choices)
-    language = models.CharField(max_length=4, choices=LanguageType.choices)
+    language = models.CharField(
+        max_length=4, choices=LanguageType.choices, default=LanguageType.KO
+    )
     instruction = models.TextField()
 
     class Meta:

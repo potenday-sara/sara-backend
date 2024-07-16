@@ -15,7 +15,7 @@ class RankSerializer(ModelSerializer):
         model = Question
         fields = (
             "type",
-            "language"
+            "language",
             "product",
             "rank",
         )
