@@ -1,11 +1,14 @@
 from django.db import models
 
 from core.models import CommonModel
-from questions.models.ai_models import AIType
+from questions.models.ai_models import AIType, LanguageType
 
 
 class Question(CommonModel):
     type = models.CharField(max_length=4, choices=AIType.choices)
+    language = models.CharField(
+        max_length=4, choices=LanguageType.choices, default=LanguageType.KO
+    )
     content = models.TextField()
     product = models.TextField()
     hidden = models.BooleanField(default=False)

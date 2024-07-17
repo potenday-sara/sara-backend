@@ -14,6 +14,17 @@ class QuestionListRequestParamsSerializer(RequestSerializer):
         choices=[("all", "all"), ("sara", "sara"), ("mara", "mara")],
         default="all",
     )
+    language = serializers.ChoiceField(
+        choices=[("all", "all"), ("KO", "KO"), ("JA", "JA"), ("EN", "EN")],
+        default="KO",
+    )
+
+
+class QuestionRandomRequestParamsSerializer(RequestSerializer):
+    language = serializers.ChoiceField(
+        choices=[("all", "all"), ("KO", "KO"), ("JA", "JA"), ("EN", "EN")],
+        default="KO",
+    )
 
 
 class QuestionSerializer(ModelSerializer):
@@ -27,6 +38,7 @@ class QuestionSerializer(ModelSerializer):
             "id",
             "content",
             "product",
+            "language",
             "type",
             "answer",
             "like_count",

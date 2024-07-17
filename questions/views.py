@@ -17,6 +17,7 @@ from questions.serializers import (
     FeedbackSerializer,
     QuestionFeedbackSerializer,
     QuestionListRequestParamsSerializer,
+    QuestionRandomRequestParamsSerializer,
     QuestionSerializer,
 )
 from questions.tasks import task_get_answer
@@ -53,6 +54,11 @@ class QuestionViewSet(
         if request_serializer.validated_data["type"] != "all":
             queryset = queryset.filter(type=request_serializer.validated_data["type"])
 
+        if request_serializer.validated_data["language"] != "all":
+            queryset = queryset.filter(
+                language=request_serializer.validated_data["language"]
+            )
+
         if request_serializer.validated_data["order"] == "like":
             queryset = queryset.order_by("-like_count")
         else:
@@ -66,13 +72,21 @@ class QuestionViewSet(
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(
-        detail=False,
-        methods=["get"],
-    )
+    @action(detail=False, methods=["get"])
+    @swagger_auto_schema(query_serializer=QuestionRandomRequestParamsSerializer)
     def random(self, request, *args, **kwargs):
         self.pagination_class = None
+        request_serializer = QuestionRandomRequestParamsSerializer(
+            data=request.query_params
+        )
+        request_serializer.is_valid(raise_exception=True)
+
         queryset = self.filter_queryset(self.get_queryset())
+
+        if request_serializer.validated_data["language"] != "all":
+            queryset = queryset.filter(
+                language=request_serializer.validated_data["language"]
+            )
 
         queryset = (
             queryset.filter(
