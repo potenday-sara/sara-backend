@@ -6,7 +6,7 @@ from django.db.models.functions import TruncDay
 from rangefilter.filters import DateRangeFilter
 
 from answers.models import Answer
-from questions.models import AI, Feedback, Question, QuestionFeedback
+from questions.models import AI, Comment, Feedback, Question, QuestionFeedback
 from questions.serializers import QuestionDateCountSerializer
 
 
@@ -61,6 +61,13 @@ class FeedbackInline(admin.StackedInline):
     extra = 1
 
 
+class CommentsInline(admin.StackedInline):
+    fields = ["nickname", "content", "created_at"]
+    readonly_fields = ["nickname", "content", "created_at"]
+    model = Comment
+    extra = 0
+
+
 class QuestionAdmin(admin.ModelAdmin):
     fields = ["type", "language", "content", "product", "hidden"]
     ordering = ["-created_at"]
@@ -77,12 +84,14 @@ class QuestionAdmin(admin.ModelAdmin):
     list_filter = [
         ("created_at", DateRangeFilter),
         ("updated_at", DateRangeFilter),
+        ("language"),
     ]
     search_fields = ["content", "product"]
     list_display_links = ["content", "product"]
     readonly_fields = ["product", "content", "created_at", "updated_at"]
     inlines = [
         AnswerInline,
+        CommentsInline,
         QuestionFeedbackInline,
         FeedbackInline,
     ]
