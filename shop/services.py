@@ -169,22 +169,28 @@ class AliExpressAPI:
                 keywords=keywords,
                 page_size=limit,
             )
+
         except Exception as e:
             print(f"failed to get hostproducts: {e}")
             traceback.print_exc()
             return []
         p_list = getattr(hotproducts, "products")
         result = []
+
         for p in p_list:
             result.append(
                 {
                     "productId": getattr(p, "product_id"),
-                    "productImage": getattr(p, "product_main_image_url"),
+                    "productImage": getattr(p, "product_main_image_url", ""),
                     "productName": getattr(p, "product_title"),
-                    "productPrice": getattr(p, "target_app_sale_price"),
+                    "productPrice": getattr(
+                        p, "target_app_sale_price", getattr(p, "target_original_price")
+                    ),
                     "productUrl": getattr(p, "promotion_link"),
                     "productPriceCurrency": getattr(
-                        p, "target_app_sale_price_currency"
+                        p,
+                        "target_app_sale_price_currency",
+                        getattr(p, "target_original_price_currency"),
                     ),
                 }
             )
@@ -204,4 +210,5 @@ class AliExpressAPI:
         }
         self.language = language_mapping.get(language, language_mapping["KO"])
         self.currency = currency_mapping.get(language, currency_mapping["KO"])
+
         return self.__get_product_list(category_code, keywords)
