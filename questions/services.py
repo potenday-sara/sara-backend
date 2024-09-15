@@ -20,7 +20,19 @@ class GPTService:
                 ).instruction,
             }
         ]
-        self.message_template = "[구매 조언 요청 형식]\n상품:%s\n고민하고 있는 이유:%s"
+
+        if language_type == "JA":
+            self.message_template = (
+                "[購入アドバイスリクエストの形式]\n商品:%s\n悩んでいる理由:%s"
+            )
+        elif language_type == "EN":
+            self.message_template = (
+                "[Purchase Advice Request Format]\nProduct:%s\nReason for hesitation:%s"
+            )
+        else:
+            self.message_template = (
+                "[구매 조언 요청 형식]\n상품:%s\n고민하고 있는 이유:%s"
+            )
 
     def get_answer(self, product: str, question: str) -> str:
         message = {
