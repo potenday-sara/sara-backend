@@ -26,6 +26,15 @@
         <p>{{ total_count }}</p>
     </div>
 
+    <div class="feedback_count">
+      <h3>{% trans 'Feedback Average (5: good, 3: normal, 1:bad)' %}</h3>
+      <p>{{ feedback_average }}</p>
+
+    <div class="feedback_rate">
+      <h3>{% trans 'Feedback Rate (feedback / total question)' %}</h3>
+      <p>{{ participation_rate }}</p>
+    
+    </div>
     <!-- Date Wise Count Graph -->
     <div class="date-count-graph">
         <h3>{% trans 'Date Wise Count' %}</h3>

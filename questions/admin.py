@@ -85,6 +85,7 @@ class QuestionAdmin(admin.ModelAdmin):
         ("created_at", DateRangeFilter),
         ("updated_at", DateRangeFilter),
         ("language"),
+        ("questionfeedback__feedback"),
     ]
     search_fields = ["content", "product"]
     list_display_links = ["content", "product"]
@@ -138,6 +139,33 @@ class QuestionAdmin(admin.ModelAdmin):
         # 총 카운트
         total_count = Question.objects.count()
 
+        # 피드백이 있는 질문 수
+        feedback_good_count = (
+            Question.objects.filter(questionfeedback__feedback=1).distinct().count()
+        )
+        feedback_normal_count = (
+            Question.objects.filter(questionfeedback__feedback=0).distinct().count()
+        )
+        feedback_bad_count = (
+            Question.objects.filter(questionfeedback__feedback=-1).distinct().count()
+        )
+        feedback_count = (
+            feedback_good_count + feedback_normal_count + feedback_bad_count
+        )
+        if total_count > 0:
+            participation_rate = (feedback_count / total_count) * 100
+        else:
+            participation_rate = 0
+
+        if feedback_count > 0:
+            feedback_average = (
+                5 * feedback_good_count
+                + 3 * feedback_normal_count
+                + 1 * feedback_bad_count
+            ) / feedback_count
+        else:
+            feedback_average = 0
+
         # 커스텀 컨텍스트 생성
         if extra_context is None:
             extra_context = {}
@@ -161,6 +189,8 @@ class QuestionAdmin(admin.ModelAdmin):
         )
         extra_context["type_counts"] = type_counts
         extra_context["total_count"] = total_count
+        extra_context["participation_rate"] = participation_rate
+        extra_context["feedback_average"] = feedback_average
 
         # 기본 changelist_view 메소드 호출
         return super().changelist_view(request, extra_context=extra_context)
