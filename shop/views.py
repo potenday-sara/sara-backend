@@ -37,7 +37,7 @@ class CategoryViewSet(ReadOnlyModelViewSet):
             if request_serializer.validated_data["language"] == "KO"
             else ShopType.ALIEXPRESS
         )
-        queryset = queryset.filter(type=category_type)
+        queryset = queryset.filter(type=category_type, language=request_serializer.validated_data["language"])
 
         serializer = self.get_serializer(queryset, many=True)
 

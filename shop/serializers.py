@@ -24,6 +24,7 @@ class CategorySerializer(ModelSerializer):
             "id",
             "code",
             "type",
+            "language",
             "name",
         )
 
